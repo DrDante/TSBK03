@@ -5,7 +5,11 @@
 extern "C" {
 #endif
 
-#include <GL/glew.h>
+#ifdef _WIN32
+	#include <GL/glew.h>
+#else
+	#include <GL/gl.h>
+#endif
 #include <GL/freeglut.h>
 
 void printError(const char *functionName);

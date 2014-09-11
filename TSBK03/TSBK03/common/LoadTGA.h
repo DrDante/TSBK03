@@ -1,7 +1,11 @@
 #ifndef __TGA_LOADER__
 #define __TGA_LOADER__
 
-#include "GL/glew.h"
+#ifdef _WIN32
+	#include "GL/glew.h"
+#else
+	#include <GL/gl.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
