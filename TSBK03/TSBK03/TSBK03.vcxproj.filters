@@ -41,12 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\bloom.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\bloom.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\lowpass.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -69,6 +63,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shaders\threshold.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\addtextures.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\addtextures.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

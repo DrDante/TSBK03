@@ -1,26 +1,25 @@
 #version 150
 
-in vec3 in_Position;	// Vertex position.
-//in vec2 in_TexCoord;	// Texture coordinate.
-in vec3 in_Normal;	// Vertex normal.
+in vec3 in_Position;	// Vertex-positionen.
+//in vec2 in_TexCoord;	// Texturkoordinat.
+in vec3 in_Normal;		// Vertex-normal.
 
 //out vec2 out_TexCoord;
 out vec3 outNormal;
 out vec3 outCamPos;
 out vec3 outObjPos;
 
-//out float pos;
+uniform mat4 MTWMatrix;	// Model-to-world-matris.
+uniform mat4 WTVMatrix;	// World-to-view-matris (kamera).
+uniform mat4 VTPMatrix;	// View-to-projection-matris (lins).
+uniform vec3 camPos;	// Kamernapositionen.
 
-uniform mat4 MTWMatrix;	// Model-to-world matrix.
-uniform mat4 WTVMatrix;	// World-to-view matrix (camera).
-uniform mat4 VTPMatrix;	// View-to-projection matrix (lens).
-uniform vec3 camPos;	// Camera position.
-
-// Och här trodde jag ZPR flyttade kameran, inte kaninen. Suck...
-const int numberOfLightSources = 4;
-uniform vec3 lightSourcesDirPosArr[numberOfLightSources];
+// Och här trodde jag ZPR flyttade kameran, inte kaninen. Vettigt i en ljusuppgift. Suck...
+// All kod med USCH i phongshadern är för att flytta ljuset med kaninen (WTV).
+// Jag räknar med att vi kan slänga den här koden när vi har en egen kameraflyttningsfunktion.
+uniform vec3 lightSourcesDirPosArr[4];
 out vec3 tempLightDir;
-// --------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix)));
 
@@ -30,14 +29,11 @@ void main(void)
 	//out_TexCoord = in_TexCoord;
 	outNormal = normalTransformMatrix * in_Normal;
 	
-	//vec3 tempPos = vec3(MTWMatrix * vec4(in_Position, 1.0));
-	//pos = tempPos.y;
-
 	vec3 temp = vec3(camPos[0], camPos[1], camPos[2]);
 	outCamPos = temp;
 	outObjPos = vec3(MTWMatrix * vec4(in_Position, 1));
 
-	// -----------------------------USCH-----------------------------
+	// ------------------------------------------USCH------------------------------------------
 	tempLightDir = mat3(WTVMatrix) * lightSourcesDirPosArr[0];
-	// --------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
 }
