@@ -1,11 +1,11 @@
-
 #version 150
 
-in vec2 outTexCoord;
-uniform sampler2D texUnit;
+in vec2 out_TexCoord;
+
 out vec4 out_Color;
 
-uniform float t;
+uniform sampler2D texUnit;
+//uniform float t;
 
 void main(void)
 {
@@ -17,7 +17,7 @@ void main(void)
 	int area = (side*2+1)*(side*2+1);
 	for(int x = -side; x <= side; x++){
 		for(int y = -side; y <= side; y++){
-			acc += vec3(textureOffset(texUnit, outTexCoord, ivec2(x, y)));
+			acc += vec3(textureOffset(texUnit, out_TexCoord, ivec2(x, y)));
 		}
 	}
 	acc = acc / area;

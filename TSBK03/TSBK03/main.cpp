@@ -67,7 +67,21 @@ GLfloat t = 0;
 
 //-------------------------------------------------------------------------------------
 
-mat4 smallerbunny = S(0.1, 0.1, 0.1);
+// -------------------Light source(s)-------------------
+const int numberOfLightSources = 4;	// Change here and in the fragment shader when setting the number of light sources.
+Point3D lightSourcesColorsArr[] = { { 1.0f, 1.0f, 1.0f },	// White light.
+{ 0.0f, 0.0f, 0.0f },	// No light.
+{ 0.0f, 0.0f, 0.0f },	// No light.
+{ 0.0f, 0.0f, 0.0f } };	// No light.
+GLfloat specularExponent[] = { 150.0, 0.0, 0.0, 0.0 };
+GLint isDirectional[] = { 1, 0, 0, 0 };
+Point3D lightSourcesDirectionsPositions[] = { { 0.58f, 0.58f, 0.58f },	// White light, directional.
+{ 0.0f, 0.0f, 0.0f },			// No light.
+{ 0.0f, 0.0f, 0.0f },			// No light.
+{ 0.0f, 0.0f, 0.0f } };			// No light.
+// -----------------------------------------------------
+
+mat4 bunnyTrans;
 
 void init(void)
 {
@@ -104,6 +118,19 @@ void init(void)
 	// model1 = LoadModelPlus("objects/stanford-bunny.obj");
 	model1 = LoadModelPlus("objects/bunnyplus.obj");
 
+	// Scale and place bunny since it is too small
+	bunnyTrans = T(0, 0, 0);
+	bunnyTrans = Mult(S(8, 8, 8), bunnyTrans);
+
+	// Lighting stuff.
+	glUseProgram(phongshader);
+	glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesDirPosArr"), numberOfLightSources, &lightSourcesDirectionsPositions[0].x);
+	glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesColorArr"), numberOfLightSources, &lightSourcesColorsArr[0].x);
+	glUniform1fv(glGetUniformLocation(phongshader, "specularExponent"), numberOfLightSources, specularExponent);
+	glUniform1iv(glGetUniformLocation(phongshader, "isDirectional"), numberOfLightSources, isDirectional);
+	glActiveTexture(GL_TEXTURE0);
+	// -----------------------------------
+
 	squareModel = LoadDataToModel(
 		square, NULL, squareTexCoord, NULL,
 		squareIndices, 4, 6);
@@ -114,6 +141,7 @@ void init(void)
 	glutTimerFunc(5, &OnTimer, 0);
 
 	zprInit(&viewMatrix, cam, point);
+	//viewMatrix = lookAtv(cam, point, vec3(0.0, 1.0, 0.0));
 }
 
 void OnTimer(int value)
@@ -125,8 +153,6 @@ void OnTimer(int value)
 //-------------------------------callback functions------------------------------------------
 void display(void)
 {
-	mat4 vm2;
-
 	// This function is called whenever it is time to render
 	//  a new frame; due to the idle()-function below, this
 	//  function will get called several times per second
@@ -140,19 +166,15 @@ void display(void)
 
 	// Activate shader program
 	glUseProgram(phongshader);
-
-	vm2 = viewMatrix;
-	// Scale and place bunny since it is too small
-	vm2 = Mult(vm2, T(0, -8.5, 0));
-	vm2 = Mult(vm2, S(80, 80, 80));
-
+	
 	// Increase "time"
 	t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 
 
-	glUniformMatrix4fv(glGetUniformLocation(phongshader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
-	//glUniformMatrix4fv(glGetUniformLocation(phongshader, "modelviewMatrix"), 1, GL_TRUE, vm2.m);
-	glUniformMatrix4fv(glGetUniformLocation(phongshader, "modelviewMatrix"), 1, GL_TRUE, Mult(vm2, smallerbunny).m);
+	glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	//glUniformMatrix4fv(glGetUniformLocation(phongshader, "modelviewMatrix"), 1, GL_TRUE, bunnyTrans.m);
+	glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_TRUE, viewMatrix.m);
+	glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, bunnyTrans.m);
 	glUniform3fv(glGetUniformLocation(phongshader, "camPos"), 1, &cam.x);
 	glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
 
@@ -163,10 +185,10 @@ void display(void)
 	glCullFace(GL_BACK);
 
 	DrawModel(model1, phongshader, "in_Position", "in_Normal", NULL);
-
+	
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-
+	
 	// THRESHOLD
 
 	glUseProgram(thresholdshader);
@@ -175,7 +197,7 @@ void display(void)
 
 	// FILTERING
 
-	/* glUniform1f(glGetUniformLocation(lowpasshader, "t"), t); */
+	// glUniform1f(glGetUniformLocation(lowpasshader, "t"), t); 
 
 
 	glUseProgram(lowpasshader);
