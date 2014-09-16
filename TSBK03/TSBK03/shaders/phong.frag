@@ -53,11 +53,11 @@ void main(void)
 	r[0] = normalize(2 * outNormal * dot(normalize(s[0]), normalize(outNormal)) - s[0]);
 	// ----------------------------------------------------------------------------------------
 	// eye-vektorn beräknas.
-	eye = normalize(outCamPos-outObjPos);
+	eye = normalize(outCamPos - outObjPos);
 
 	// Ljus enligt Phong-modellen:
-	kdiff = 3.5;
-	kspec = 1.0;
+	kdiff = 1.0;
+	kspec = 7.0;
 	ambLight = kdiff * vec3(0.1, 0.1, 0.1);
 	diffLight = vec3(0.0, 0.0, 0.0);
 	specLight = vec3(0.0, 0.0, 0.0);
@@ -66,18 +66,12 @@ void main(void)
 	{
 		diffLight += kdiff * lightSourcesColorArr[i] * max(0.0, dot(s[i], normalize(outNormal)));
 	}
-	/*
-	// --------------Bör fixas så småningom (se "checklistan" ovan)--------------
-	// Calculates specular light, if the surface is not Lambertian.
-	if(!lambert)
+	// Spekulärt ljus.
+	for (int i = 0; i < numberOfLightSources; i++)
 	{
-		for (int i = 0; i < numberOfLightSources; i++)
-		{
-			specLight += kspec * lightSourcesColorArr[i] * max(0.0, pow(dot(r[i], eye), specularExponent[i]));
-		}
+		specLight += kspec * lightSourcesColorArr[i] * max(0.0, pow(dot(r[i], eye), specularExponent[i]));
 	}
-	// --------------------------------------------------------------------------
-	*/
+
 	totalLight = vec3(0.0, 0.0, 0.0);
 	// De olika ljuskomponenterna adderas till det totala ljuset.
 	totalLight += ambLight;

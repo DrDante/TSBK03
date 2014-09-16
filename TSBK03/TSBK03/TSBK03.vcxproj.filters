@@ -41,12 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\lowpass.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\lowpass.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\phong.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -69,6 +63,18 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shaders\addtextures.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lowpassx.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lowpassx.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lowpassy.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\lowpassy.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

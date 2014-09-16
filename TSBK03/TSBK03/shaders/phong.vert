@@ -21,7 +21,10 @@ uniform vec3 lightSourcesDirPosArr[4];
 out vec3 tempLightDir;
 // ----------------------------------------------------------------------------------------
 
-mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix)));
+// Nedanstående bör fixas.
+//mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix)));
+//mat3 normalTransformMatrix = inverse(transpose(mat3(WTVMatrix * MTWMatrix)));
+mat3 normalTransformMatrix = mat3(WTVMatrix * MTWMatrix);
 
 void main(void)
 {

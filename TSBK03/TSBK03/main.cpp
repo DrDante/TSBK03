@@ -40,7 +40,7 @@
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
 // Antal filter
-#define FILTER_PASSES 10
+#define FILTER_PASSES 100
 // -------------------------------------------------------------
 
 // Kvadratmodellen, som resultat från filter ritas upp på.
@@ -66,7 +66,7 @@ mat4 projectionMatrix;
 mat4 viewMatrix;
 mat4 bunnyTrans;
 // Shaders.
-GLuint phongshader = 0, plaintextureshader = 0, lowpasshader = 0, thresholdshader = 0, addtexshader = 0;
+GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0, lowpassyshader, thresholdshader = 0, addtexshader = 0;
 // FBOs.
 FBOstruct *fbo1, *fbo2, *fbo_orig;
 // Övrigt.
@@ -113,7 +113,8 @@ void init(void)
 	// Ladda och kompilera shaders.
 	plaintextureshader = loadShaders("shaders/plaintextureshader.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
 	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");									// Renderar ljus (enligt Phong-modellen).
-	lowpasshader = loadShaders("shaders/lowpass.vert", "shaders/lowpass.frag");								// Lågpassfiltrerar input. BÖR FIXAS (AMD, samt "riktig" Gauss-filtrering).
+	lowpassxshader = loadShaders("shaders/lowpassx.vert", "shaders/lowpassx.frag");							// Lågpassfiltrerar input i x-led.
+	lowpassyshader = loadShaders("shaders/lowpassy.vert", "shaders/lowpassy.frag");							// Lågpassfiltrerar input i y-led.
 	thresholdshader = loadShaders("shaders/threshold.vert", "shaders/threshold.frag");						// Sparar undan det överflödiga ljuset ett objekt kan ha.
 	addtexshader = loadShaders("shaders/addtextures.vert", "shaders/addtextures.frag");						// Adderar två texturer till varandra.
 
@@ -143,7 +144,7 @@ void init(void)
 
 	// Initiell placering och orientering av kamera.
 	cam = SetVector(0, 5, 15);
-	point = SetVector(0, 1, 0);
+	point = SetVector(0, 0, 0);
 	zprInit(&viewMatrix, cam, point);
 	//viewMatrix = lookAtv(cam, point, vec3(0.0, 1.0, 0.0));
 
@@ -165,11 +166,12 @@ void display(void)
 	
 	// Öka tidsvariabeln t.
 	//t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	mat4 bunnyTotal = bunnyTrans;
 
 	// Uppladdning av matriser och annan data till phongshadern.
 	glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_TRUE, viewMatrix.m);
-	glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, bunnyTrans.m);
+	glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, bunnyTotal.m);
 	glUniform3fv(glGetUniformLocation(phongshader, "camPos"), 1, &cam.x);
 	glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
 
@@ -186,6 +188,7 @@ void display(void)
 	// Avaktivering av z-buffering och backface culling (allt nedan är en platt bild).
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
+	
 	// ----------------------------Bloom----------------------------
 	// 1. Threshold.
 	// Allt ljus över 1.0 sparas undan i fbo2, m.h.a. thresholdshadern.
@@ -194,15 +197,15 @@ void display(void)
 	DrawModel(squareModel, thresholdshader, "in_Position", NULL, "in_TexCoord");
 
 	// 2. Filtrering.
-	// Det undansparade ljuset (1) filtreras rekursivt FILTER_PASSES * 2 gånger.
-	glUseProgram(lowpasshader);
+	// Det undansparade ljuset (1) filtreras rekursivt FILTER_PASSES gånger.
 	for (int i = 0; i < FILTER_PASSES; i++)
 	{
+		glUseProgram(lowpassxshader);
 		useFBO(fbo1, fbo2, 0L);
-		DrawModel(squareModel, lowpasshader, "in_Position", NULL, "in_TexCoord");
-
+		DrawModel(squareModel, lowpassxshader, "in_Position", NULL, "in_TexCoord");
+		glUseProgram(lowpassyshader);
 		useFBO(fbo2, fbo1, 0L);
-		DrawModel(squareModel, lowpasshader, "in_Position", NULL, "in_TexCoord");
+		DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
 	}
 
 	// 3. Blooming.
@@ -213,7 +216,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
 	// -------------------------------------------------------------
-
+	
 	// Uppritning av bilden, m.h.a. plaintextureshadern.
 	glUseProgram(plaintextureshader);
 	useFBO(0L, fbo1, 0L);
