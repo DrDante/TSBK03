@@ -7,7 +7,7 @@
 #ifdef _WIN32
 	#include <gl/glew.h>
 #else
-	#include <gl/gl.h>
+	#include <GL/gl.h>
 #endif
 #include <math.h>
 

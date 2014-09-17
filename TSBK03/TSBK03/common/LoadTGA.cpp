@@ -30,7 +30,7 @@ bool LoadTGATextureData(char *filename, TextureData *texture)	// Loads A TGA Fil
 	GLubyte *rowP;
 	int err;
 	GLubyte rle;
-	int b;
+	unsigned int b;
 	long row, rowLimit;
 	GLubyte pixelData[4];
 	
@@ -163,7 +163,7 @@ bool LoadTGATextureData(char *filename, TextureData *texture)	// Loads A TGA Fil
 		} while (i < imageSize);
 	}
 
-	for (i = 0; i < (int)(imageSize); i += bytesPerPixel)	// Loop Through The Image Data
+	for (i = 0; i < (unsigned int)(imageSize); i += bytesPerPixel)	// Loop Through The Image Data
 	{		// Swaps The 1st And 3rd Bytes ('R'ed and 'B'lue)
 		temp = texture->imageData[i];		// Temporarily Store The Value At Image Data 'i'
 		texture->imageData[i] = texture->imageData[i + 2];	// Set The 1st Byte To The Value Of The 3rd Byte
@@ -194,7 +194,7 @@ bool LoadTGATexture(char *filename, TextureData *texture)	// Loads A TGA File In
 	GLubyte *rowP;
 	int err;
 	GLubyte rle;
-	int b;
+	unsigned int b;
 	long row, rowLimit;
 	GLubyte pixelData[4];
 	
@@ -330,7 +330,7 @@ bool LoadTGATexture(char *filename, TextureData *texture)	// Loads A TGA File In
 	}
 
 
-	for (i = 0; i < (int)(imageSize); i += bytesPerPixel)	// Loop Through The Image Data
+	for (i = 0; i < (unsigned int)(imageSize); i += bytesPerPixel)	// Loop Through The Image Data
 	{		// Swaps The 1st And 3rd Bytes ('R'ed and 'B'lue)
 		temp = texture->imageData[i];		// Temporarily Store The Value At Image Data 'i'
 		texture->imageData[i] = texture->imageData[i + 2];	// Set The 1st Byte To The Value Of The 3rd Byte

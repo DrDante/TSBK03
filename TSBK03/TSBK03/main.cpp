@@ -18,12 +18,13 @@
 	//#include <windows.h>
 	#include <gl/glew.h>
 	// Glew initialization... thing.
+    #include <gl/freeglut.h>
 	GLenum err;
 #else
 	// Linux
-	#include <gl/gl.h>
+	#include <GL/gl.h>
+    #include <GL/freeglut.h>
 #endif
-#include <gl/freeglut.h>
 
 #include "common/VectorUtils3.h"
 #include "common/GL_utilities.h"
@@ -126,7 +127,7 @@ void init(void)
 	fbo_orig = initFBO(W, H, 0);
 
 	// Laddning av modeller.
-	model1 = LoadModelPlus("objects/bunnyplus.obj");
+	model1 = LoadModelPlus((char*)"objects/bunnyplus.obj");
 	squareModel = LoadDataToModel(square, NULL, squareTexCoord, NULL, squareIndices, 4, 6);
 
 	// Initiell placering och skalning av modeller.

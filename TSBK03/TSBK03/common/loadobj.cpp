@@ -368,7 +368,7 @@ static void ReadOneFace(MeshPtr theMesh)
 
 		coordCount++;
 	}
-	while (tokenType != kEOF && tokenType != crlfToken != atLineEnd);
+	while ((tokenType != kEOF) && ((tokenType != crlfToken) != atLineEnd));
 //	while (tokenType != kEOF && tokenType != crlfToken && tokenType != atLineEnd);
 // Very strange line, the obvious correction does not work. What is it supposed to be? /Ingemar
 

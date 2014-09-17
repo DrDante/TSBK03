@@ -21,8 +21,8 @@
 #else
 // Linux
 	#include <stdio.h>
-	#include <gl/gl.h>
-	#include "MicroGlut.h"
+	#include <GL/gl.h>
+	#include <GL/freeglut.h>
 #endif
 
 #include "VectorUtils3.h"
