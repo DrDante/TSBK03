@@ -40,8 +40,13 @@
 #define H 512
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
-// Antal filter
-#define FILTER_PASSES 50
+// Antal lågpassfilter
+#define FILTER_PASSES 30
+// Antal ljusspridningar på diagonalerna
+#define DIAG_PASSES 10
+// Antal lågpassfilter på diagonalerna
+#define DIAG_FILTER_PASSES 2
+
 // -------------------------------------------------------------
 
 // Kvadratmodellen, som resultat från filter ritas upp på.
@@ -67,9 +72,11 @@ mat4 projectionMatrix;
 mat4 viewMatrix;
 mat4 bunnyTrans;
 // Shaders.
-GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0, lowpassyshader, thresholdshader = 0, addtexshader = 0;
+GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0,
+       lowpassyshader, thresholdshader = 0, addtexshader = 0, diag1shader = 0,
+       diag2shader = 0;
 // FBOs.
-FBOstruct *fbo1, *fbo2, *fbo_orig;
+FBOstruct *fbo1, *fbo2, *fbo3, *fbo4, *fbo_orig;
 // Övrigt.
 //GLfloat t = 0;	// Tidsvariabel.
 
@@ -113,17 +120,21 @@ void init(void)
 
 	// Ladda och kompilera shaders.
 	plaintextureshader = loadShaders("shaders/plaintextureshader.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
-	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");									// Renderar ljus (enligt Phong-modellen).
-	lowpassxshader = loadShaders("shaders/lowpassx.vert", "shaders/lowpassx.frag");							// Lågpassfiltrerar input i x-led.
-	lowpassyshader = loadShaders("shaders/lowpassy.vert", "shaders/lowpassy.frag");							// Lågpassfiltrerar input i y-led.
-	thresholdshader = loadShaders("shaders/threshold.vert", "shaders/threshold.frag");						// Sparar undan det överflödiga ljuset ett objekt kan ha.
-	addtexshader = loadShaders("shaders/addtextures.vert", "shaders/addtextures.frag");						// Adderar två texturer till varandra.
-
+	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");					// Renderar ljus (enligt Phong-modellen).
+	lowpassxshader = loadShaders("shaders/lowpassx.vert", "shaders/lowpassx.frag");				// Lågpassfiltrerar input i x-led.
+	lowpassyshader = loadShaders("shaders/lowpassy.vert", "shaders/lowpassy.frag");				// Lågpassfiltrerar input i y-led.
+	thresholdshader = loadShaders("shaders/threshold.vert", "shaders/threshold.frag");			// Sparar undan det överflödiga ljuset ett objekt kan ha.
+	addtexshader = loadShaders("shaders/addtextures.vert", "shaders/addtextures.frag");			// Adderar två texturer till varandra.
+	diag1shader = loadShaders("shaders/diag.vert", "shaders/diag1.frag");					// Sprider ut ljus i \ diagonalen
+	diag2shader = loadShaders("shaders/diag.vert", "shaders/diag2.frag");					// Sprider ut ljus i / diagonalen
+	
 	printError("init shader");
 
 	// FBO inits.
 	fbo1 = initFBO(W, H, 0);
 	fbo2 = initFBO(W, H, 0);
+	fbo3 = initFBO(W, H, 0);
+	fbo4 = initFBO(W, H, 0);
 	fbo_orig = initFBO(W, H, 0);
 
 	// Laddning av modeller.
@@ -193,34 +204,92 @@ void display(void)
 	// ----------------------------Bloom----------------------------
 	// 1. Threshold.
 	// Allt ljus över 1.0 sparas undan i fbo2, m.h.a. thresholdshadern.
+	//
+	// Efter Threshold:
+	// Trösklat ljus i fbo2
 	glUseProgram(thresholdshader);
 	useFBO(fbo2, fbo_orig, 0L);
 	DrawModel(squareModel, thresholdshader, "in_Position", NULL, "in_TexCoord");
 
-	// 2. Filtrering.
+	// 2. Sprid ut ljus i diagonalerna
+	//
+	// Efter ljusspridning:
+	// \ Diagonaler i fbo3
+	// / Diagonaler i fbo4
+	glUseProgram(diag1shader);
+
+	useFBO(fbo3, fbo2, 0L);
+	DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
+	for (int i = 0; i < DIAG_PASSES; i++){
+	    useFBO(fbo1, fbo3, 0L);
+	    DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
+	    useFBO(fbo3, fbo1, 0L);
+	    DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
+	}
+
+	glUseProgram(diag2shader);
+
+	useFBO(fbo4, fbo2, 0L);
+	DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
+	for (int i = 0; i < DIAG_PASSES; i++){
+	    useFBO(fbo1, fbo4, 0L);
+	    DrawModel(squareModel, diag2shader, "In_Position", NULL, "In_TexCoord");
+	    useFBO(fbo4, fbo1, 0L);
+	    DrawModel(squareModel, diag2shader, "In_Position", NULL, "In_TexCoord");
+	}
+
+	// 3. Addera ljuset på diagonalerna
+	//
+	// Efter addering:
+	// Ljusdiagonaler i fbo1
+	glUseProgram(addtexshader);
+	useFBO(fbo1, fbo3, fbo4);
+	glUniform1i(glGetUniformLocation(addtexshader, "texUnit2"), 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
+
+	// 4. Filtrering.
 	// Det undansparade ljuset (1) filtreras rekursivt FILTER_PASSES gånger.
+	//
+	// Efter filtrering:
+	// Utsmetat ljus i fbo2
 	for (int i = 0; i < FILTER_PASSES; i++)
 	{
 		glUseProgram(lowpassxshader);
-		useFBO(fbo1, fbo2, 0L);
+		useFBO(fbo3, fbo2, 0L);
 		DrawModel(squareModel, lowpassxshader, "in_Position", NULL, "in_TexCoord");
 		glUseProgram(lowpassyshader);
-		useFBO(fbo2, fbo1, 0L);
+		useFBO(fbo2, fbo3, 0L);
 		DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
 	}
 
-	// 3. Blooming.
-	// Det filtrerade överskottet (2) av ursprungsbildens ljus adderas till ursprungsbilden.
+	// 4. Filtera ljuset på diagonalerna
+	// 
+	// Efter filtrering:
+	// Utsmetade diagonaler i fbo1
+	for (int i = 0; i < DIAG_FILTER_PASSES; i++){
+		glUseProgram(lowpassxshader);
+		useFBO(fbo3, fbo1, 0L);
+		DrawModel(squareModel, lowpassxshader, "in_Position", NULL, "in_TexCoord");
+		glUseProgram(lowpassyshader);
+		useFBO(fbo1, fbo3, 0L);
+		DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
+	}
+
+	// 5. Blooming.
+	// Det filtrerade överskottet (2) av ursprungsbildens ljus adderas till ursprungsbilden och ljusdiagonalerna.
 	glUseProgram(addtexshader);
-	useFBO(fbo1, fbo2, fbo_orig);
+	useFBO(fbo3, fbo2, fbo_orig);
 	glUniform1i(glGetUniformLocation(addtexshader, "texUnit2"), 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
+	useFBO(fbo2, fbo3, fbo1);
 	DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
 	// -------------------------------------------------------------
 	
 	// Uppritning av bilden, m.h.a. plaintextureshadern.
 	glUseProgram(plaintextureshader);
-	useFBO(0L, fbo1, 0L);
+	useFBO(0L, fbo2, 0L);
 	DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");
 
 	glutSwapBuffers();
