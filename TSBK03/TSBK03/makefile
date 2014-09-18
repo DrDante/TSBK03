@@ -4,10 +4,10 @@ BIN = bin
 CC = gcc
 CXX = g++
 
-WARNINGS = -Wall -Wextra # Till att börja med, är rädd för Ingemars kod
+WARNINGS = -Wall -Wextra -Wno-unused-parameter # Till att börja med, är rädd för Ingemars kod
 
 CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES
-CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES
+CXXFLAGS = -g $(WARNINGS) -std=c++11 -DGL_GLEXT_PROTOTYPES
 
 LIB = GL m glut X11
 

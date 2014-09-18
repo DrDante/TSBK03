@@ -18,7 +18,7 @@
 	//#include <windows.h>
 	#include <gl/glew.h>
 	// Glew initialization... thing.
-    #include <gl/freeglut.h>
+        #include <gl/freeglut.h>
 	GLenum err;
 #else
 	// Linux
@@ -41,7 +41,7 @@
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
 // Antal filter
-#define FILTER_PASSES 100
+#define FILTER_PASSES 50
 // -------------------------------------------------------------
 
 // Kvadratmodellen, som resultat från filter ritas upp på.
