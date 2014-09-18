@@ -137,6 +137,21 @@ void init(void)
 	fbo4 = initFBO(W, H, 0);
 	fbo_orig = initFBO(W, H, 0);
 
+	// Clamp texturkoordinater istället för repeat så inte ljus läcker över
+	// kanterna
+	glBindTexture(GL_TEXTURE_2D, fbo1->texid);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, fbo2->texid);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, fbo3->texid);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, fbo4->texid);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 	// Laddning av modeller.
 	model1 = LoadModelPlus((char*)"objects/bunnyplus.obj");
 	squareModel = LoadDataToModel(square, NULL, squareTexCoord, NULL, squareIndices, 4, 6);
@@ -253,6 +268,7 @@ void display(void)
 	//
 	// Efter filtrering:
 	// Utsmetat ljus i fbo2
+
 	for (int i = 0; i < FILTER_PASSES; i++)
 	{
 		glUseProgram(lowpassxshader);
