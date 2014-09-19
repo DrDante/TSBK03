@@ -83,6 +83,9 @@ GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0,
        diag2shader = 0;
 // FBOs.
 FBOstruct *fbo1, *fbo2, *fbo3, *fbo4, *fbo_orig;
+// Skärmstorlek
+int width; 
+int height; 
 // Övrigt.
 //GLfloat t = 0;	// Tidsvariabel.
 
@@ -317,7 +320,7 @@ void display(void)
 
     // Uppritning av bilden, m.h.a. plaintextureshadern.
     glUseProgram(plaintextureshader);
-    useFBO(0L, fbo_orig, 0L);
+    useFBO(0L, fbo2, 0L);
     DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");
 
     swap_buffers();
@@ -366,7 +369,9 @@ void event_handler(SDL_Event event)
 		case SDL_WINDOWEVENT:
 			switch(event.window.event){
 			    case SDL_WINDOWEVENT_RESIZED:
+				get_window_size(&width, &height);
 				resize_window(event);
+				reshape(width, height, &projectionMatrix);
 				break;
 			} 
 			break;
@@ -406,18 +411,13 @@ void handle_keypress(SDL_Event event){
 	case SDLK_h:
 	    SDL_SetRelativeMouseMode(SDL_TRUE);
 	    break;
-
 	default: 
 	    break;
     }
 }
 
 void handle_mouse(SDL_Event event){
-    int width; 
-    int height; 
-
     get_window_size(&width, &height);
-
     cam.change_look_at_pos(event.motion.xrel,event.motion.y,width,height);
 }
 

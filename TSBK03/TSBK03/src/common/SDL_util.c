@@ -43,21 +43,6 @@ void resize_window(SDL_Event event)
 		fprintf(stderr, "Error resizing window: %s", SDL_GetError());
 		exit_prog(1);
 	}
-
-
-	int new_width;
-	int new_height;
-
-	SDL_GetWindowSize(screen, &new_width, &new_height);
-
-	glViewport(0, 0, new_width, new_height);
-	glMatrixMode(GL_PROJECTION);
-	glOrtho(0, new_width, 0, new_height, -1, 1);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
 }
 
 void inf_loop()
