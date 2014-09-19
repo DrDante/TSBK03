@@ -237,14 +237,14 @@ void keyDown(unsigned char key, int x, int y)
 	keymap[(unsigned int)key] = 1;
 }
 
-void initKeymapManager()
-{
-	int i;
-	for (i = 0; i < 256; i++) keymap[i] = 0;
+/* void initKeymapManager() */
+/* { */
+/* 	int i; */
+/* 	for (i = 0; i < 256; i++) keymap[i] = 0; */
 
-	glutKeyboardFunc(keyDown);
-	glutKeyboardUpFunc(keyUp);
-}
+/* 	glutKeyboardFunc(keyDown); */
+/* 	glutKeyboardUpFunc(keyUp); */
+/* } */
 
 
 // FBO

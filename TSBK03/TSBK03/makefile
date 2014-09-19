@@ -1,32 +1,36 @@
 EXE = main
 BIN = bin
+SRC = src
 
 CC = gcc
 CXX = g++
 
-WARNINGS = -Wall -Wextra -Wno-unused-parameter # Till att börja med, är rädd för Ingemars kod
+WARNINGS = -Wall -Wextra -Wno-unused-parameter
 
-CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES
-CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES
+CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES `sdl-config --cflags`
+CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES `sdl-config --cflags`
 
-LIB = GL m glut X11
 
-LDXFLAGS = $(addprefix -l,$(LIB))
+LIB = GL m X11
 
-CSOURCES = common/GL_utilities.c common/VectorUtils3.c common/zpr.c
-CXSOURCES = common/LoadTGA.cpp common/loadobj.cpp main.cpp
+LDXFLAGS = $(addprefix -l,$(LIB)) `sdl-config --libs`
 
-COBJ = $(patsubst %.c,$(BIN)/%.o, $(CSOURCES))
-CXOBJ = $(patsubst %.cpp,$(BIN)/%.o, $(CXSOURCES))
+CSOURCES = $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/common/*.c)
+CXSOURCES = $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/common/*.cpp)
+
+COBJ = $(patsubst $(SRC)/%.c,$(BIN)/%.o, $(CSOURCES))
+CXOBJ = $(patsubst $(SRC)/%.cpp,$(BIN)/%.o, $(CXSOURCES))
 
 OBJ = $(COBJ) $(CXOBJ)
 
+COMMONDIR = $(SRC)/common
+
 all: bin $(EXE)
 
-$(BIN)/%.o: %.c
+$(BIN)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $? -o $@
 
-$(BIN)/%.o: %.cpp
+$(BIN)/%.o: $(SRC)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $? -o $@
 
 main: $(OBJ)
@@ -36,7 +40,7 @@ bin:
 	mkdir -p bin/common
 
 clean:
-	rm $(OBJ)
+	rm -r $(OBJ)
 
 cleanall:
-	rm $(EXE) $(OBJ)
+	rm -r $(EXE) $(OBJ)
