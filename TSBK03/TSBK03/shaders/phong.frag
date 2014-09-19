@@ -50,7 +50,7 @@ void main(void)
 	}
 	// ------------------------------------------USCH------------------------------------------
 	s[0] = normalize(tempLightDir - (1 - isDirectional[0]) * outObjPos);
-	r[0] = normalize(2 * outNormal * dot(normalize(s[0]), normalize(outNormal)) - s[0]);
+	r[0] = normalize(2 * outNormal * dot(s[0], normalize(outNormal)) - s[0]);
 	// ----------------------------------------------------------------------------------------
 	// eye-vektorn beräknas.
 	eye = normalize(outCamPos - outObjPos);
@@ -78,7 +78,5 @@ void main(void)
 	totalLight += diffLight;
 	totalLight += specLight;
 
-	vec4 tempTotalLight = vec4(totalLight, 1.0);
-
-	out_Color = tempTotalLight;
+	out_Color = vec4(totalLight, 1.0);
 }
