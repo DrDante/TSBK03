@@ -502,9 +502,9 @@ static struct Mesh * LoadOBJ(const char *filename)
 void DecomposeToTriangles(struct Mesh *theMesh)
 {
 	int i, vertexCount, triangleCount;
-	int *newCoords = nullptr;
-	int *newNormalsIndex = nullptr;
-	int *newTextureIndex = nullptr;
+	int *newCoords = NULL;
+	int *newNormalsIndex = NULL;
+	int *newTextureIndex = NULL;
 	
 	// 1. Bygg om hela modellen till trianglar
 	// 1.1 Calculate how big the list will become
