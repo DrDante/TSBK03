@@ -125,20 +125,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\addtextures.frag" />
-    <None Include="shaders\addtextures.vert" />
-    <None Include="shaders\diag.vert" />
     <None Include="shaders\diag1.frag" />
     <None Include="shaders\diag2.frag" />
     <None Include="shaders\lowpassx.frag" />
-    <None Include="shaders\lowpassx.vert" />
     <None Include="shaders\lowpassy.frag" />
-    <None Include="shaders\lowpassy.vert" />
+    <None Include="shaders\passthrough.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\phong.vert" />
     <None Include="shaders\plaintextureshader.frag" />
-    <None Include="shaders\plaintextureshader.vert" />
     <None Include="shaders\threshold.frag" />
-    <None Include="shaders\threshold.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\GL_utilities.h" />

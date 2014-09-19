@@ -50,40 +50,25 @@
     <None Include="shaders\plaintextureshader.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\plaintextureshader.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\threshold.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\threshold.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shaders\addtextures.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\addtextures.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\lowpassx.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\lowpassx.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="shaders\lowpassy.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\lowpassy.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\diag.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shaders\diag1.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shaders\diag2.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\passthrough.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

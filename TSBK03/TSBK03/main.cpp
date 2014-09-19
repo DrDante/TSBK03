@@ -40,11 +40,11 @@
 #define H 512
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
-// Antal lågpassfilter
+// Antal lågpassfilter.
 #define FILTER_PASSES 30
-// Antal ljusspridningar på diagonalerna
+// Antal ljusspridningar på diagonalerna.
 #define DIAG_PASSES 10
-// Antal lågpassfilter på diagonalerna
+// Antal lågpassfilter på diagonalerna.
 #define DIAG_FILTER_PASSES 2
 
 // -------------------------------------------------------------
@@ -120,13 +120,13 @@ void init(void)
 
 	// Ladda och kompilera shaders.
 	plaintextureshader = loadShaders("shaders/passthrough.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
-	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");					// Renderar ljus (enligt Phong-modellen).
-	lowpassxshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassx.frag");				// Lågpassfiltrerar input i x-led.
-	lowpassyshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassy.frag");				// Lågpassfiltrerar input i y-led.
-	thresholdshader = loadShaders("shaders/passthrough.vert", "shaders/threshold.frag");			// Sparar undan det överflödiga ljuset ett objekt kan ha.
-	addtexshader = loadShaders("shaders/passthrough.vert", "shaders/addtextures.frag");			// Adderar två texturer till varandra.
-	diag1shader = loadShaders("shaders/passthrough.vert", "shaders/diag1.frag");					// Sprider ut ljus i \ diagonalen
-	diag2shader = loadShaders("shaders/passthrough.vert", "shaders/diag2.frag");					// Sprider ut ljus i / diagonalen
+	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");								// Renderar ljus (enligt Phong-modellen).
+	lowpassxshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassx.frag");					// Lågpassfiltrerar input i x-led.
+	lowpassyshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassy.frag");					// Lågpassfiltrerar input i y-led.
+	thresholdshader = loadShaders("shaders/passthrough.vert", "shaders/threshold.frag");				// Sparar undan det överflödiga ljuset ett objekt kan ha.
+	addtexshader = loadShaders("shaders/passthrough.vert", "shaders/addtextures.frag");					// Adderar två texturer till varandra.
+	diag1shader = loadShaders("shaders/passthrough.vert", "shaders/diag1.frag");						// Sprider ut ljus i \ diagonalen
+	diag2shader = loadShaders("shaders/passthrough.vert", "shaders/diag2.frag");						// Sprider ut ljus i / diagonalen
 	
 	printError("init shader");
 
@@ -137,8 +137,7 @@ void init(void)
 	fbo4 = initFBO(W, H, 0);
 	fbo_orig = initFBO(W, H, 0);
 
-	// Clamp texturkoordinater istället för repeat så inte ljus läcker över
-	// kanterna
+	// Clampar texturkoordinater istället för repeat så att ljus inte läcker över kanterna.
 	glBindTexture(GL_TEXTURE_2D, fbo1->texid);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -221,16 +220,16 @@ void display(void)
 	// Allt ljus över 1.0 sparas undan i fbo2, m.h.a. thresholdshadern.
 	//
 	// Efter Threshold:
-	// Trösklat ljus i fbo2
+	// Trösklat ljus i fbo2.
 	glUseProgram(thresholdshader);
 	useFBO(fbo2, fbo_orig, 0L);
 	DrawModel(squareModel, thresholdshader, "in_Position", NULL, "in_TexCoord");
 
-	// 2. Sprid ut ljus i diagonalerna
+	// 2. Sprid ut ljus i diagonalerna.
 	//
 	// Efter ljusspridning:
-	// \ Diagonaler i fbo3
-	// / Diagonaler i fbo4
+	// \ Diagonaler i fbo3.
+	// / Diagonaler i fbo4.
 	glUseProgram(diag1shader);
 
 	useFBO(fbo3, fbo2, 0L);
@@ -256,7 +255,7 @@ void display(void)
 	// 3. Addera ljuset på diagonalerna
 	//
 	// Efter addering:
-	// Ljusdiagonaler i fbo1
+	// Ljusdiagonaler i fbo1.
 	glUseProgram(addtexshader);
 	useFBO(fbo1, fbo3, fbo4);
 	glUniform1i(glGetUniformLocation(addtexshader, "texUnit2"), 1);
@@ -267,7 +266,7 @@ void display(void)
 	// Det undansparade ljuset (1) filtreras rekursivt FILTER_PASSES gånger.
 	//
 	// Efter filtrering:
-	// Utsmetat ljus i fbo2
+	// Utsmetat ljus i fbo2.
 
 	for (int i = 0; i < FILTER_PASSES; i++)
 	{
@@ -279,10 +278,10 @@ void display(void)
 		DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
 	}
 
-	// 4. Filtera ljuset på diagonalerna
+	// 4. Filtera ljuset på diagonalerna.
 	// 
 	// Efter filtrering:
-	// Utsmetade diagonaler i fbo1
+	// Utsmetade diagonaler i fbo1.
 	for (int i = 0; i < DIAG_FILTER_PASSES; i++){
 		glUseProgram(lowpassxshader);
 		useFBO(fbo3, fbo1, 0L);
