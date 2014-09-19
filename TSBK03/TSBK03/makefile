@@ -7,11 +7,11 @@ CXX = g++
 
 WARNINGS = -Wall -Wextra -Wno-unused-parameter
 
-CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES `sdl-config --cflags`
-CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES `sdl-config --cflags`
+CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES
+CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES
 
 
-LIB = GL m X11
+LIB = GL m X11 SDL2
 
 LDXFLAGS = $(addprefix -l,$(LIB)) `sdl-config --libs`
 

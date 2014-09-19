@@ -2,7 +2,8 @@
 #include <GL/glu.h>
 #include "SDL_util.h"
 
-SDL_Surface* screen;
+SDL_Window* screen ;
+SDL_GLContext glcontext;
 int bpp;
 
 void (*ptdisplay)(void);
@@ -23,9 +24,10 @@ void set_event_handler(void (*event_func)(SDL_Event event))
 }
 
 void exit_prog(int value)
-{
-	SDL_Quit();
-	exit(value);
+{ 
+    SDL_GL_DeleteContext(glcontext);
+    SDL_Quit();
+    exit(value);
 }
 
 void terminate_prog( void )
@@ -35,16 +37,18 @@ void terminate_prog( void )
 
 void resize_window(SDL_Event event)
 {
-	int flags = SDL_OPENGL | SDL_HWSURFACE | SDL_RESIZABLE;
-	screen = SDL_SetVideoMode(event.resize.w, event.resize.h, bpp, flags);
+	SDL_SetWindowSize(screen, event.window.data1, event.window.data2);
 
 	if(screen == NULL){
 		fprintf(stderr, "Error resizing window: %s", SDL_GetError());
 		exit_prog(1);
 	}
 
-	int new_width = screen->w;
-	int new_height = screen->h;
+
+	int new_width;
+	int new_height;
+
+	SDL_GetWindowSize(screen, &new_width, &new_height);
 
 	glViewport(0, 0, new_width, new_height);
 	glMatrixMode(GL_PROJECTION);
@@ -55,20 +59,6 @@ void resize_window(SDL_Event event)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 }
-
-/*
-void handle_userevent(SDL_Event event)
-{
-	switch(event.user.code){
-//		case (int)CUSTOM_TIMER:
-				//(*ptdisplay)();
-//				break;
-		default:
-			break;
-	}	
-}
-*/
-
 
 void inf_loop()
 {
@@ -81,56 +71,59 @@ void inf_loop()
 	}
 }
 
-void init_SDL()
+void swap_buffers()
 {
-	const SDL_VideoInfo* inf = NULL;
-	
-	int width, height, flags = 0;
+    SDL_GL_SwapWindow(screen);
+}
+
+void get_window_size(int *w, int*h)
+{
+    SDL_GetWindowSize(screen, w, h);
+}
+
+void init_SDL(const char* title, int width, int height)
+{
+	int flags = 0;
 	
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
 		fprintf(stderr, "Failed to initialise SDL: %s", SDL_GetError());
 		exit_prog(1);
 	}
-
-	inf = SDL_GetVideoInfo();
-	if(!inf){
-		fprintf(stderr, "Failed to get Video Info: %s", SDL_GetError());
-		exit_prog(1);
-	}
-	
-	width = inf->current_w;
-	height = inf->current_h;
-	bpp = inf->vfmt->BitsPerPixel;
 	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 
-	flags = SDL_OPENGL | SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF;
+	flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-	screen = SDL_SetVideoMode(width >> 1, height >> 1, bpp, flags);
+	screen = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		width, height, flags);
+	glcontext = SDL_GL_CreateContext(screen);
 
 	if(screen == 0){
 		fprintf(stderr, "Failed to set Video Mode: %s", SDL_GetError());
 		exit_prog(1);
 	}
 	
-	glViewport(0, 0, width >> 1, height >> 1);
+	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
-	glOrtho(0, width >> 1, 0, height >> 1, -1, 1);
+	glOrtho(0, width, 0, height, -1, 1);
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 
-	
 	atexit(terminate_prog);
 }

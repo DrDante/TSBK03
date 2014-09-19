@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include "VectorUtils3.h"
 /******************************************************************************
  * Koder för egna event, såsom timers och liknande.
  * Används för att indentifiera ett specifikt event.
@@ -28,10 +29,12 @@ void set_event_handler(void (*event_func)(SDL_Event event));
 
 /******************************************************************************
  * Initierar SDLs system så att allt bör kunna fungera
- * Inparametrar:	-
+ * Inparametrar:	const char* title		Titel till fönstret
+ *			int width			Bredd på fönstret
+ *			int height			Höjd på fönstret
  * Returnerar:		-
  *****************************************************************************/
-void init_SDL();
+void init_SDL(const char* title, int width, int height);
 
 /******************************************************************************
  * oändlig loop som väntar på events och hanterar dessa. Uppdaterar skärmen.
@@ -39,6 +42,13 @@ void init_SDL();
  * Returnerar:		-
  *****************************************************************************/
 void inf_loop();
+
+void get_window_size(int* w, int* h);
+
+/*****************************************************************************
+ * Byt buffer, ersätter glutSwapBuffers
+ * ***************************************************************************/
+void swap_buffers();
 
 void resize_window(SDL_Event event);
 

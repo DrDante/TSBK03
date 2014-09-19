@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <SDL.h>
-//#include <iostream>
+#include <SDL2/SDL.h>
+#include <iostream>
 
 #ifdef _WIN32
 // MS
@@ -31,7 +31,7 @@ GLenum err;
 #include "common/GL_utilities.h"
 #include "common/loadobj.h"
 #include "common/LoadTGA.h"
-#include "common/zpr.h"
+#include "camera.h"
 #include "common/SDL_util.h"
 // -------------------------------------------------------------
 
@@ -48,6 +48,11 @@ GLenum err;
 #define DIAG_PASSES 10
 // Antal lågpassfilter på diagonalerna
 #define DIAG_FILTER_PASSES 2
+
+#define DISPLAY_TIMER 0
+#define UPDATE_TIMER 1
+
+#define SPEED 2
 
 // -------------------------------------------------------------
 
@@ -66,9 +71,8 @@ Model* squareModel;
 // ---------------------------Globals---------------------------
 // Modeller.
 Model *model1;
-// Vektorer.
-vec3 cam = vec3(0.0, 0.0, 0.0);
-vec3 point = vec3(0.0, 0.0, 0.0);
+// Kamera (ersätter zpr)
+Camera cam;
 // Matriser.
 mat4 projectionMatrix;
 mat4 viewMatrix;
@@ -98,8 +102,9 @@ Point3D lightSourcesDirectionsPositions[] = { { 0.58f, 0.58f, 0.58f },	// Vitt l
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
-void reshape(GLsizei w, GLsizei h);
+void reshape(int w, int h, mat4 *projectionMatrix);
 void idle();
+
 
 // SDL functions
 void handle_keypress(SDL_Event event);
@@ -179,12 +184,10 @@ void init(void)
     // -------------------------------------------------------------
 
     // Initiell placering och orientering av kamera.
-    cam = SetVector(0, 5, 15);
-    point = SetVector(0, 0, 0);
-    zprInit(&viewMatrix, cam, point);
-    //viewMatrix = lookAtv(cam, point, vec3(0.0, 1.0, 0.0));
+    cam = Camera(phongshader, &viewMatrix);
 
-    glutTimerFunc(5, &OnTimer, 0);
+    // SDL för att dölja mus och låsa den till fönstret
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 
@@ -208,7 +211,7 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_TRUE, viewMatrix.m);
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, bunnyTotal.m);
-    glUniform3fv(glGetUniformLocation(phongshader, "camPos"), 1, &cam.x);
+    /* glUniform3fv(glGetUniformLocation(phongshader, "camPos"), 1, &cam.x); */
     glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
 
     // Aktivera z-buffering (inför Phong shading).
@@ -314,41 +317,148 @@ void display(void)
 
     // Uppritning av bilden, m.h.a. plaintextureshadern.
     glUseProgram(plaintextureshader);
-    useFBO(0L, fbo2, 0L);
+    useFBO(0L, fbo_orig, 0L);
     DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");
 
-    SDL_GL_SwapBuffers();
+    swap_buffers();
 }
 
+// Timer för uppritande av skärm. Man får inte kalla funktioner här inne
+Uint32 display_timer(Uint32 interval, void* param)
+{
+	SDL_Event event;
+	
+	event.type = SDL_USEREVENT;
+	event.user.code = DISPLAY_TIMER;
+	event.user.data1 = 0;
+	event.user.data2 = 0;
+
+	SDL_PushEvent(&event);
+	return interval;
+}
+
+Uint32 update_timer(Uint32 interval, void* param)
+{
+    SDL_Event event;
+
+    event.type = SDL_USEREVENT;
+    event.user.code = UPDATE_TIMER;
+    event.user.data1 = (void*) (intptr_t) interval;
+    event.user.data2 = 0;
+
+    SDL_PushEvent(&event);
+    return interval;
+}
+
+// Hantera event
+void event_handler(SDL_Event event)
+{
+	switch(event.type){
+		case SDL_USEREVENT:
+			handle_userevent(event);
+			break;
+		case SDL_QUIT:
+			exit(0);
+			break;
+		case SDL_KEYDOWN:
+			handle_keypress(event);
+			break;
+		case SDL_WINDOWEVENT:
+			switch(event.window.event){
+			    case SDL_WINDOWEVENT_RESIZED:
+				resize_window(event);
+				break;
+			} 
+			break;
+		case SDL_MOUSEMOTION:
+			handle_mouse(event);
+			break;
+		default:
+			break;
+	}
+}
+
+// Hantera avändardefinierade event
+void handle_userevent(SDL_Event event)
+{
+    switch(event.user.code){
+        case (int)DISPLAY_TIMER:
+            display();
+            break;
+	case (int)UPDATE_TIMER:
+	    check_keys();
+	    break;
+        default:
+            break;
+    }
+}
+
+// Hantera knapptryckningar
+void handle_keypress(SDL_Event event){
+    switch(event.key.keysym.sym){
+	case SDLK_ESCAPE:
+	case SDLK_q:
+	    exit(0);
+	    break;
+	case SDLK_g:
+	    SDL_SetRelativeMouseMode(SDL_FALSE);
+	    break;
+	case SDLK_h:
+	    SDL_SetRelativeMouseMode(SDL_TRUE);
+	    break;
+
+	default: 
+	    break;
+    }
+}
+
+void handle_mouse(SDL_Event event){
+    int width; 
+    int height; 
+
+    get_window_size(&width, &height);
+
+    cam.change_look_at_pos(event.motion.xrel,event.motion.y,width,height);
+}
+
+void check_keys()
+{
+    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+    if(keystate[SDL_SCANCODE_W]) {
+        cam.forward(0.1*SPEED);
+    } else if(keystate[SDL_SCANCODE_S]) {
+        cam.forward(-0.1*SPEED);
+    }
+    if(keystate[SDL_SCANCODE_A]) {
+        cam.strafe(0.1*SPEED);
+    } else if(keystate[SDL_SCANCODE_D]) {
+        cam.strafe(-0.1*SPEED);
+    }
+}
 
 int main(int argc, char *argv[])
 {
-    init_SDL();
+    init_SDL((const char*) "TSBK03 Projekt SDL", 640, 480);
+    reshape(640, 480, &projectionMatrix);
     init();
-    glutMainLoop();
+    SDL_TimerID timer_id;
+    timer_id = SDL_AddTimer(30, &display_timer, NULL);
+    timer_id = SDL_AddTimer(10, &update_timer, NULL);
+    if(timer_id == 0){
+	std::cerr << "Error setting timer function: " << SDL_GetError() << std::endl;
+    }
+    set_event_handler(&event_handler);
+    inf_loop();
+    return 0;
 }
 
 // --------------------Function definitions---------------------
 // -----------------Ingemars hjälpfunktioner-----------------
-void OnTimer(int value)
-{
-    glutPostRedisplay();
-    glutTimerFunc(5, &OnTimer, value);
-}
-
-void reshape(GLsizei w, GLsizei h)
+void reshape(int w, int h, mat4 *projectionMatrix)
 {
     glViewport(0, 0, w, h);
     GLfloat ratio = (GLfloat)w / (GLfloat)h;
-    projectionMatrix = perspective(90, ratio, 1.0, 1000);
-}
-
-// This function is called whenever the computer is idle
-// As soon as the machine is idle, ask GLUT to trigger rendering of a new
-// frame
-void idle()
-{
-    glutPostRedisplay();
+    *projectionMatrix = perspective(90, ratio, 1.0, 1000);
 }
 // ----------------------------------------------------------
 // -------------------------------------------------------------
