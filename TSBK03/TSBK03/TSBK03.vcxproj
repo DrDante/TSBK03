@@ -126,6 +126,9 @@
   <ItemGroup>
     <None Include="shaders\addtextures.frag" />
     <None Include="shaders\addtextures.vert" />
+    <None Include="shaders\diag.vert" />
+    <None Include="shaders\diag1.frag" />
+    <None Include="shaders\diag2.frag" />
     <None Include="shaders\lowpassx.frag" />
     <None Include="shaders\lowpassx.vert" />
     <None Include="shaders\lowpassy.frag" />

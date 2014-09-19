@@ -77,6 +77,15 @@
     <None Include="shaders\lowpassy.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="shaders\diag.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\diag1.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\diag2.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\GL_utilities.h">
