@@ -119,14 +119,14 @@ void init(void)
 	printError("GL inits");
 
 	// Ladda och kompilera shaders.
-	plaintextureshader = loadShaders("shaders/plaintextureshader.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
+	plaintextureshader = loadShaders("shaders/passthrough.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
 	phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");					// Renderar ljus (enligt Phong-modellen).
-	lowpassxshader = loadShaders("shaders/lowpassx.vert", "shaders/lowpassx.frag");				// Lågpassfiltrerar input i x-led.
-	lowpassyshader = loadShaders("shaders/lowpassy.vert", "shaders/lowpassy.frag");				// Lågpassfiltrerar input i y-led.
-	thresholdshader = loadShaders("shaders/threshold.vert", "shaders/threshold.frag");			// Sparar undan det överflödiga ljuset ett objekt kan ha.
-	addtexshader = loadShaders("shaders/addtextures.vert", "shaders/addtextures.frag");			// Adderar två texturer till varandra.
-	diag1shader = loadShaders("shaders/diag.vert", "shaders/diag1.frag");					// Sprider ut ljus i \ diagonalen
-	diag2shader = loadShaders("shaders/diag.vert", "shaders/diag2.frag");					// Sprider ut ljus i / diagonalen
+	lowpassxshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassx.frag");				// Lågpassfiltrerar input i x-led.
+	lowpassyshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassy.frag");				// Lågpassfiltrerar input i y-led.
+	thresholdshader = loadShaders("shaders/passthrough.vert", "shaders/threshold.frag");			// Sparar undan det överflödiga ljuset ett objekt kan ha.
+	addtexshader = loadShaders("shaders/passthrough.vert", "shaders/addtextures.frag");			// Adderar två texturer till varandra.
+	diag1shader = loadShaders("shaders/passthrough.vert", "shaders/diag1.frag");					// Sprider ut ljus i \ diagonalen
+	diag2shader = loadShaders("shaders/passthrough.vert", "shaders/diag2.frag");					// Sprider ut ljus i / diagonalen
 	
 	printError("init shader");
 
