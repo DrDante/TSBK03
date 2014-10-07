@@ -1,13 +1,12 @@
 #include "camera.h"
 #include <cmath>
 #include <iostream>
-using namespace std;
 
-Camera::Camera(int program, mat4 *matrix)
+Camera::Camera(int program, glm::mat4 *matrix)
 {
     this->matrix = matrix;
     this->program = program;
-    *matrix = lookAtv(position, look_at_pos, up);
+    *matrix = glm::lookAt(position, look_at_pos, up);
     upload();
 }
 
@@ -18,18 +17,13 @@ Camera::Camera()
 void Camera::upload()
 {
     // Upload camera matrix here
-    /* glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, GL_TRUE, (*matrix).m); */
-    
-    cam_position[0] = position.x;
-    cam_position[1] = position.y;
-    cam_position[2] = position.z;
-        
-    glUniform3fv(glGetUniformLocation(program, "camPos"), 1, (const GLfloat*) (cam_position));
+    /* glUniformMatrix4fv(glGetUniformLocation(program, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(*matrix)); */
+    glUniform3fv(glGetUniformLocation(program, "camPos"), 1, glm::value_ptr(position));
     
 }
 void Camera::update()
 {
-    *matrix = lookAtv(position, look_at_pos, up);
+    *matrix = glm::lookAt(position, look_at_pos, up);
     upload();
 }
 
@@ -37,46 +31,45 @@ void Camera::rotate(char direction, float angle)
 {
     switch (direction){
         case 'x':
-            look_at_pos = Rx(angle) * look_at_pos;
+            look_at_pos = glm::rotate(look_at_pos, angle, glm::vec3(1,0,0));
             break;
         case 'y':
-            look_at_pos = Ry(angle) * look_at_pos;
+            look_at_pos = glm::rotate(look_at_pos, angle, glm::vec3(0,1,0));
             break;
         case 'z':
-            look_at_pos = Rz(angle) * look_at_pos;
+            look_at_pos = glm::rotate(look_at_pos, angle, glm::vec3(0,0,1));
             break;
     }
-    *matrix = lookAtv(position, look_at_pos, up);
+    *matrix = glm::lookAt(position, look_at_pos, up);
     upload();
 }
 
 void Camera::translate(float dx, float dy, float dz)
 {
-    position =  T(dx,dy,dz) * position;
-    look_at_pos = T(dx,dy,dz) * look_at_pos;
-    *matrix = lookAtv(position, look_at_pos, up);
+    position = glm::vec3(glm::translate(glm::mat4(1.0f), glm::vec3(dx,dy,dz)) * glm::vec4(position, 1));
+    look_at_pos = glm::vec3(glm::translate(glm::mat4(1.0f), glm::vec3(dx,dy,dz)) * glm::vec4(look_at_pos, 1));
+    *matrix = glm::lookAt(position, look_at_pos, up);
     upload();
 }
 
 void Camera::forward(float d)
 {
-    vec3 forward_vec = look_at_pos - position;
+    glm::vec3 forward_vec = look_at_pos - position;
     forward_vec = d * forward_vec;
     translate(forward_vec.x, forward_vec.y, forward_vec.z);
 }
 
 void Camera::strafe(float d)
 {
-    vec3 strafe_vec = look_at_pos - position;
-    strafe_vec = CrossProduct(up, strafe_vec);
-    strafe_vec = Normalize(strafe_vec);
+    glm::vec3 strafe_vec = look_at_pos - position;
+    strafe_vec = glm::cross(up, strafe_vec);
+    strafe_vec = glm::normalize(strafe_vec);
     strafe_vec = d * strafe_vec;
     translate(strafe_vec.x, strafe_vec.y, strafe_vec.z);
 }
 
 void Camera::change_look_at_pos(int xrel, int y, int width, int height)
 {
-    // FIXME ful lösning är detta
     if(y==0){
         y = 1;
     }
@@ -87,6 +80,15 @@ void Camera::change_look_at_pos(int xrel, int y, int width, int height)
     look_at_pos.x = -sin(theta)*sin(fi) + position.x;
     look_at_pos.y = cos(theta) + position.y;
     look_at_pos.z = sin(theta)*cos(fi) + position.z;
-    *matrix = lookAtv(position, look_at_pos, up);
+    *matrix = glm::lookAt(position, look_at_pos, up);
     upload();
+}
+
+void Camera::print_matrix(glm::mat4 m)
+{
+    std::cout << m[0][0] << ", "  << m[0][1] << ", " << m[0][2] << ", " << m[0][3] << std::endl;
+    std::cout << m[1][0] << ", "  << m[1][1] << ", " << m[1][2] << ", " << m[1][3] << std::endl;
+    std::cout << m[2][0] << ", "  << m[2][1] << ", " << m[2][2] << ", " << m[2][3] << std::endl;
+    std::cout << m[3][0] << ", "  << m[3][1] << ", " << m[3][2] << ", " << m[3][3] << std::endl;
+    std::cout << std::endl;
 }

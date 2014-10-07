@@ -15,17 +15,25 @@
 #include <iostream>
 
 #ifdef _WIN32
-// MS
-//#include <windows.h>
+    // MS
+    //#include <windows.h>
 #include <gl/glew.h>
-// Glew initialization... thing.
+    // Glew initialization... thing.
 #include <gl/freeglut.h>
-GLenum err;
+    GLenum err;
 #else
-// Linux
+    // Linux
 #include <GL/gl.h>
-/* #include <GL/freeglut.h> */
+#include <GL/freeglut.h>
 #endif
+
+// För att glm inte ska skrika i kompilering
+#define GLM_FORCE_RADIANS
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include "common/VectorUtils3.h"
 #include "common/GL_utilities.h"
@@ -75,8 +83,8 @@ Model *model1;
 Camera cam;
 // Matriser.
 mat4 projectionMatrix;
-mat4 viewMatrix;
-mat4 bunnyTrans;
+glm::mat4 viewMatrix;
+glm::mat4 bunnyTrans;
 // Shaders.
 GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0,
        lowpassyshader, thresholdshader = 0, addtexshader = 0, diag1shader = 0,
@@ -174,8 +182,9 @@ void init(void)
     squareModel = LoadDataToModel(square, NULL, squareTexCoord, NULL, squareIndices, 4, 6);
 
     // Initiell placering och skalning av modeller.
-    bunnyTrans = T(0, 0, 0);
-    bunnyTrans = Mult(S(8, 8, 8), bunnyTrans);
+    bunnyTrans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
+    bunnyTrans = glm::matrixCompMult(bunnyTrans, glm::scale(glm::mat4(1.0f), glm::vec3(8,8,8)));
+    /* bunnyTrans = Mult(S(8, 8, 8), bunnyTrans); */
 
     // ------Ladda upp info om ljuskällorna till phongshadern-------
     glUseProgram(phongshader);
@@ -208,13 +217,12 @@ void display(void)
 
     // Öka tidsvariabeln t.
     //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-    mat4 bunnyTotal = bunnyTrans;
+    glm::mat4 bunnyTotal = bunnyTrans;
 
     // Uppladdning av matriser och annan data till phongshadern.
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_TRUE, viewMatrix.m);
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, bunnyTotal.m);
-    /* glUniform3fv(glGetUniformLocation(phongshader, "camPos"), 1, &cam.x); */
+    glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, glm::value_ptr(bunnyTotal));
     glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
 
     // Aktivera z-buffering (inför Phong shading).
