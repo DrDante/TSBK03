@@ -36,9 +36,6 @@ vec3 diffLight;		// Diffuse.
 vec3 specLight;		// Specular.
 vec3 totalLight;	// Totalt ljus.
 
-// ------------------------------------------USCH------------------------------------------
-in vec3 tempLightDir;
-// ----------------------------------------------------------------------------------------
 
 void main(void)
 {
@@ -48,10 +45,6 @@ void main(void)
 		s[i] = normalize(lightSourcesDirPosArr[i] - (1 - isDirectional[i]) * outObjPos);
 		r[i] = normalize(2 * outNormal * dot(normalize(s[i]), normalize(outNormal)) - s[i]);
 	}
-	// ------------------------------------------USCH------------------------------------------
-	s[0] = normalize(tempLightDir - (1 - isDirectional[0]) * outObjPos);
-	r[0] = normalize(2 * outNormal * dot(s[0], normalize(outNormal)) - s[0]);
-	// ----------------------------------------------------------------------------------------
 	// eye-vektorn beräknas.
 	eye = normalize(outCamPos - outObjPos);
 
