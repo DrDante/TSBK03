@@ -24,7 +24,8 @@ out vec3 tempLightDir;
 // Nedanstående bör fixas.
 /* mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix))); */
 /* mat3 normalTransformMatrix = inverse(transpose(mat3(WTVMatrix * MTWMatrix))); */
-mat3 normalTransformMatrix = mat3(WTVMatrix * MTWMatrix);
+/* mat3 normalTransformMatrix = mat3(WTVMatrix * MTWMatrix); */
+mat3 normalTransformMatrix = mat3(MTWMatrix);
 
 void main(void)
 {

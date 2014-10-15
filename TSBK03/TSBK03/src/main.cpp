@@ -15,14 +15,14 @@
 #include <iostream>
 
 #ifdef _WIN32
-    // MS
-    //#include <windows.h>
+// MS
+//#include <windows.h>
 #include <gl/glew.h>
-    // Glew initialization... thing.
+// Glew initialization... thing.
 #include <gl/freeglut.h>
-    GLenum err;
+GLenum err;
 #else
-    // Linux
+// Linux
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 #endif
@@ -34,6 +34,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "common/VectorUtils3.h"
 #include "common/GL_utilities.h"
@@ -50,47 +52,49 @@
 #define H 512
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
-// Antal lågpassfilter
-#define FILTER_PASSES 30
-// Antal ljusspridningar på diagonalerna
-#define DIAG_PASSES 10
-// Antal lågpassfilter på diagonalerna
-#define DIAG_FILTER_PASSES 2
 
 #define DISPLAY_TIMER 0
 #define UPDATE_TIMER 1
 
 #define SPEED 2
 
-// -------------------------------------------------------------
+// ---------------------------Globals---------------------------
+// Modeller.
+Model *model1, *squareModel;
+GLfloat square[] = { -1, 0, 1,
+     1,  0,  1,
+     1,  0, -1,
+    -1,  0, -1};
 
-// Kvadratmodellen, som resultat från filter ritas upp på.
-GLfloat square[] = { -1, -1, 0,
-    -1, 1, 0,
-    1, 1, 0,
-    1, -1, 0 };
 GLfloat squareTexCoord[] = { 0, 0,
     0, 1,
     1, 1,
     1, 0 };
-GLuint squareIndices[] = { 0, 1, 2, 0, 2, 3 };
-Model* squareModel;
 
-// ---------------------------Globals---------------------------
-// Modeller.
-Model *model1;
+GLuint squareIndices[] = { 0, 1, 2, 0, 2, 3 };
+
+GLfloat squareNormals[] {
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0,
+	0,1,0
+};
+    
+
 // Kamera (ersätter zpr)
 Camera cam;
 // Matriser.
 mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 bunnyTrans;
+glm::mat4 squareTrans;
 // Shaders.
-GLuint phongshader = 0, plaintextureshader = 0, lowpassxshader = 0,
-       lowpassyshader, thresholdshader = 0, addtexshader = 0, diag1shader = 0,
-       diag2shader = 0;
-// FBOs.
-FBOstruct *fbo1, *fbo2, *fbo3, *fbo4, *fbo_orig;
+GLuint phongshader = 0;
 // Skärmstorlek
 int width; 
 int height; 
@@ -107,7 +111,7 @@ GLint isDirectional[] = { 1, 0, 0, 0 };						// För punktkällor (0) är positione
 Point3D lightSourcesDirectionsPositions[] = { { 0.58f, 0.58f, 0.58f },	// Vitt ljus (riktat).
     { 0.0f, 0.0f, 0.0f },		// Inget ljus.
     { 0.0f, 0.0f, 0.0f },		// Inget ljus.
-    { 0.0f, 0.0f, 0.0f } };	// Inget ljus.
+    { 0.0f, 0.0f, 0.0f } };		// Inget ljus.
 // ----------------------------------------------------------
 // -------------------------------------------------------------
 
@@ -144,47 +148,20 @@ void init(void)
     printError("GL inits");
 
     // Ladda och kompilera shaders.
-    plaintextureshader = loadShaders("shaders/passthrough.vert", "shaders/plaintextureshader.frag");	// Sätter en textur på ett texturobjekt.
     phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");					// Renderar ljus (enligt Phong-modellen).
-    lowpassxshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassx.frag");				// Lågpassfiltrerar input i x-led.
-    lowpassyshader = loadShaders("shaders/passthrough.vert", "shaders/lowpassy.frag");				// Lågpassfiltrerar input i y-led.
-    thresholdshader = loadShaders("shaders/passthrough.vert", "shaders/threshold.frag");			// Sparar undan det överflödiga ljuset ett objekt kan ha.
-    addtexshader = loadShaders("shaders/passthrough.vert", "shaders/addtextures.frag");			// Adderar två texturer till varandra.
-    diag1shader = loadShaders("shaders/passthrough.vert", "shaders/diag1.frag");					// Sprider ut ljus i \ diagonalen
-    diag2shader = loadShaders("shaders/passthrough.vert", "shaders/diag2.frag");					// Sprider ut ljus i / diagonalen
 
     printError("init shader");
 
-    // FBO inits.
-    fbo1 = initFBO(W, H, 0);
-    fbo2 = initFBO(W, H, 0);
-    fbo3 = initFBO(W, H, 0);
-    fbo4 = initFBO(W, H, 0);
-    fbo_orig = initFBO(W, H, 0);
-
-    // Clamp texturkoordinater istället för repeat så inte ljus läcker över
-    // kanterna
-    glBindTexture(GL_TEXTURE_2D, fbo1->texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, fbo2->texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, fbo3->texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, fbo4->texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // Laddning av modeller.
     model1 = LoadModelPlus((char*)"objects/bunnyplus.obj");
-    squareModel = LoadDataToModel(square, NULL, squareTexCoord, NULL, squareIndices, 4, 6);
+    squareModel = LoadDataToModel(square, squareNormals, squareTexCoord, NULL, squareIndices, 4, 6);
 
     // Initiell placering och skalning av modeller.
-    bunnyTrans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
-    bunnyTrans = glm::matrixCompMult(bunnyTrans, glm::scale(glm::mat4(1.0f), glm::vec3(8,8,8)));
-    /* bunnyTrans = Mult(S(8, 8, 8), bunnyTrans); */
+    bunnyTrans = glm::scale(glm::mat4(), glm::vec3(3,3,3));
+
+    squareTrans = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    squareTrans = glm::translate(glm::vec3(0,-10,0)) * squareTrans;
 
     // ------Ladda upp info om ljuskällorna till phongshadern-------
     glUseProgram(phongshader);
@@ -205,9 +182,6 @@ void init(void)
 
 void display(void)
 {
-    // Först renderas till fbo_orig (inte till skärmen).
-    useFBO(fbo_orig, 0L, 0L);
-
     // Rensa framebuffer & z-buffer.
     glClearColor(0.1, 0.1, 0.3, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -222,7 +196,7 @@ void display(void)
     // Uppladdning av matriser och annan data till phongshadern.
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
     glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_TRUE, glm::value_ptr(bunnyTotal));
+    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
     glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
 
     // Aktivera z-buffering (inför Phong shading).
@@ -231,105 +205,12 @@ void display(void)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // ----------------Scenen renderas till fbo_orig----------------
+    // ----------------Scenen renderas till skärmen ----------------
     DrawModel(model1, phongshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
-
-    // Avaktivering av z-buffering och backface culling (allt nedan är en platt bild).
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-    // ----------------------------Bloom----------------------------
-    // 1. Threshold.
-    // Allt ljus över 1.0 sparas undan i fbo2, m.h.a. thresholdshadern.
-    //
-    // Efter Threshold:
-    // Trösklat ljus i fbo2
-    glUseProgram(thresholdshader);
-    useFBO(fbo2, fbo_orig, 0L);
-    DrawModel(squareModel, thresholdshader, "in_Position", NULL, "in_TexCoord");
-
-    // 2. Sprid ut ljus i diagonalerna
-    //
-    // Efter ljusspridning:
-    // \ Diagonaler i fbo3
-    // / Diagonaler i fbo4
-    glUseProgram(diag1shader);
-
-    useFBO(fbo3, fbo2, 0L);
-    DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
-    for (int i = 0; i < DIAG_PASSES; i++){
-	useFBO(fbo1, fbo3, 0L);
-	DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
-	useFBO(fbo3, fbo1, 0L);
-	DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
-    }
-
-    glUseProgram(diag2shader);
-
-    useFBO(fbo4, fbo2, 0L);
-    DrawModel(squareModel, diag1shader, "In_Position", NULL, "In_TexCoord");
-    for (int i = 0; i < DIAG_PASSES; i++){
-	useFBO(fbo1, fbo4, 0L);
-	DrawModel(squareModel, diag2shader, "In_Position", NULL, "In_TexCoord");
-	useFBO(fbo4, fbo1, 0L);
-	DrawModel(squareModel, diag2shader, "In_Position", NULL, "In_TexCoord");
-    }
-
-    // 3. Addera ljuset på diagonalerna
-    //
-    // Efter addering:
-    // Ljusdiagonaler i fbo1
-    glUseProgram(addtexshader);
-    useFBO(fbo1, fbo3, fbo4);
-    glUniform1i(glGetUniformLocation(addtexshader, "texUnit2"), 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
-
-    // 4. Filtrering.
-    // Det undansparade ljuset (1) filtreras rekursivt FILTER_PASSES gånger.
-    //
-    // Efter filtrering:
-    // Utsmetat ljus i fbo2
-
-    for (int i = 0; i < FILTER_PASSES; i++)
-    {
-	glUseProgram(lowpassxshader);
-	useFBO(fbo3, fbo2, 0L);
-	DrawModel(squareModel, lowpassxshader, "in_Position", NULL, "in_TexCoord");
-	glUseProgram(lowpassyshader);
-	useFBO(fbo2, fbo3, 0L);
-	DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
-    }
-
-    // 4. Filtera ljuset på diagonalerna
-    // 
-    // Efter filtrering:
-    // Utsmetade diagonaler i fbo1
-    for (int i = 0; i < DIAG_FILTER_PASSES; i++){
-	glUseProgram(lowpassxshader);
-	useFBO(fbo3, fbo1, 0L);
-	DrawModel(squareModel, lowpassxshader, "in_Position", NULL, "in_TexCoord");
-	glUseProgram(lowpassyshader);
-	useFBO(fbo1, fbo3, 0L);
-	DrawModel(squareModel, lowpassyshader, "in_Position", NULL, "in_TexCoord");
-    }
-
-    // 5. Blooming.
-    // Det filtrerade överskottet (2) av ursprungsbildens ljus adderas till ursprungsbilden och ljusdiagonalerna.
-    glUseProgram(addtexshader);
-    useFBO(fbo3, fbo2, fbo_orig);
-    glUniform1i(glGetUniformLocation(addtexshader, "texUnit2"), 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
-    useFBO(fbo2, fbo3, fbo1);
-    DrawModel(squareModel, addtexshader, "in_Position", NULL, "in_TexCoord");
-    // -------------------------------------------------------------
-
-    // Uppritning av bilden, m.h.a. plaintextureshadern.
-    glUseProgram(plaintextureshader);
-    useFBO(0L, fbo2, 0L);
-    DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");
+    
+    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
+    DrawModel(squareModel, phongshader, "in_Position", "in_Normal", NULL);
 
     swap_buffers();
 }
@@ -337,15 +218,15 @@ void display(void)
 // Timer för uppritande av skärm. Man får inte kalla funktioner här inne
 Uint32 display_timer(Uint32 interval, void* param)
 {
-	SDL_Event event;
-	
-	event.type = SDL_USEREVENT;
-	event.user.code = DISPLAY_TIMER;
-	event.user.data1 = 0;
-	event.user.data2 = 0;
+    SDL_Event event;
 
-	SDL_PushEvent(&event);
-	return interval;
+    event.type = SDL_USEREVENT;
+    event.user.code = DISPLAY_TIMER;
+    event.user.data1 = 0;
+    event.user.data2 = 0;
+
+    SDL_PushEvent(&event);
+    return interval;
 }
 
 Uint32 update_timer(Uint32 interval, void* param)
@@ -364,45 +245,45 @@ Uint32 update_timer(Uint32 interval, void* param)
 // Hantera event
 void event_handler(SDL_Event event)
 {
-	switch(event.type){
-		case SDL_USEREVENT:
-			handle_userevent(event);
-			break;
-		case SDL_QUIT:
-			exit(0);
-			break;
-		case SDL_KEYDOWN:
-			handle_keypress(event);
-			break;
-		case SDL_WINDOWEVENT:
-			switch(event.window.event){
-			    case SDL_WINDOWEVENT_RESIZED:
-				get_window_size(&width, &height);
-				resize_window(event);
-				reshape(width, height, &projectionMatrix);
-				break;
-			} 
-			break;
-		case SDL_MOUSEMOTION:
-			handle_mouse(event);
-			break;
-		default:
-			break;
-	}
+    switch(event.type){
+	case SDL_USEREVENT:
+	    handle_userevent(event);
+	    break;
+	case SDL_QUIT:
+	    exit(0);
+	    break;
+	case SDL_KEYDOWN:
+	    handle_keypress(event);
+	    break;
+	case SDL_WINDOWEVENT:
+	    switch(event.window.event){
+		case SDL_WINDOWEVENT_RESIZED:
+		    get_window_size(&width, &height);
+		    resize_window(event);
+		    reshape(width, height, &projectionMatrix);
+		    break;
+	    } 
+	    break;
+	case SDL_MOUSEMOTION:
+	    handle_mouse(event);
+	    break;
+	default:
+	    break;
+    }
 }
 
 // Hantera avändardefinierade event
 void handle_userevent(SDL_Event event)
 {
     switch(event.user.code){
-        case (int)DISPLAY_TIMER:
-            display();
-            break;
+	case (int)DISPLAY_TIMER:
+	    display();
+	    break;
 	case (int)UPDATE_TIMER:
 	    check_keys();
 	    break;
-        default:
-            break;
+	default:
+	    break;
     }
 }
 
@@ -433,14 +314,14 @@ void check_keys()
 {
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
     if(keystate[SDL_SCANCODE_W]) {
-        cam.forward(0.1*SPEED);
+	cam.forward(0.1*SPEED);
     } else if(keystate[SDL_SCANCODE_S]) {
-        cam.forward(-0.1*SPEED);
+	cam.forward(-0.1*SPEED);
     }
     if(keystate[SDL_SCANCODE_A]) {
-        cam.strafe(0.1*SPEED);
+	cam.strafe(0.1*SPEED);
     } else if(keystate[SDL_SCANCODE_D]) {
-        cam.strafe(-0.1*SPEED);
+	cam.strafe(-0.1*SPEED);
     }
 }
 
@@ -469,4 +350,3 @@ void reshape(int w, int h, mat4 *projectionMatrix)
     *projectionMatrix = perspective(90, ratio, 1.0, 1000);
 }
 // ----------------------------------------------------------
-// -------------------------------------------------------------
