@@ -34,6 +34,7 @@ GLenum err;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/transform2.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -43,10 +44,11 @@ GLenum err;
 #include "common/LoadTGA.h"
 #include "camera.h"
 #include "common/SDL_util.h"
+#include "shadow_map.hpp"
 // -------------------------------------------------------------
 
 // ---------------------------Defines---------------------------
-#define PI 3.14159265358979323846
+#define PI 3.14159265358979323846f
 // Bredd och höjd.
 #define W 512
 #define H 512
@@ -61,19 +63,26 @@ GLenum err;
 // ---------------------------Globals---------------------------
 // Modeller.
 Model *model1, *squareModel;
-GLfloat square[] = { -1, 0, 1,
-     1,  0,  1,
-     1,  0, -1,
-    -1,  0, -1};
+GLfloat square[] = 
+{ 
+    -1, -1, 0,
+    -1,  1, 0,
+     1,  1, 0,
+     1, -1, 0
+};
 
-GLfloat squareTexCoord[] = { 0, 0,
+GLfloat squareTexCoord[] = 
+{ 
+    0, 0,
     0, 1,
     1, 1,
-    1, 0 };
+    1, 0
+};
 
 GLuint squareIndices[] = { 0, 1, 2, 0, 2, 3 };
 
-GLfloat squareNormals[] {
+GLfloat squareNormals[] =
+{
 	0,1,0,
 	0,1,0,
 	0,1,0,
@@ -93,25 +102,34 @@ mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 bunnyTrans;
 glm::mat4 squareTrans;
+glm::mat4 scale_bias;
+
+// FBO
+FBOstruct *z_fbo;
+
 // Shaders.
-GLuint phongshader = 0;
+GLuint phongshader = 0, zshader = 0, ptshader = 0; // passthrough shader;
 // Skärmstorlek
-int width; 
-int height; 
+int width = 640; 
+int height = 480; 
 // Övrigt.
 //GLfloat t = 0;	// Tidsvariabel.
 
 // ------------------------Ljuskällor------------------------
-Point3D lightSourcesColorsArr[] = { { 1.0f, 1.0f, 1.0f },	// Vitt ljus.
-    { 0.0f, 0.0f, 0.0f },	// Inget ljus.
-    { 0.0f, 0.0f, 0.0f },	// Inget ljus.
-    { 0.0f, 0.0f, 0.0f } };	// Inget ljus.
-GLfloat specularExponent[] = { 150.0, 0.0, 0.0, 0.0 };		// Spekulär exponent, bör ändras till objektberoende.
-GLint isDirectional[] = { 1, 0, 0, 0 };						// För punktkällor (0) är positionen en position.
-Point3D lightSourcesDirectionsPositions[] = { { 0.58f, 0.58f, 0.58f },	// Vitt ljus (riktat).
-    { 0.0f, 0.0f, 0.0f },		// Inget ljus.
-    { 0.0f, 0.0f, 0.0f },		// Inget ljus.
-    { 0.0f, 0.0f, 0.0f } };		// Inget ljus.
+/* Point3D lightSourcesColorsArr[] = */ 
+/* {   { 1.0f, 1.0f, 1.0f },	// Vitt ljus. */
+/*     { 0.0f, 0.0f, 0.0f },	// Inget ljus. */
+/*     { 0.0f, 0.0f, 0.0f },	// Inget ljus. */
+/*     { 0.0f, 0.0f, 0.0f } */
+/* };	// Inget ljus. */
+/* GLfloat specularExponent[] = { 150.0, 0.0, 0.0, 0.0 };		// Spekulär exponent, bör ändras till objektberoende. */
+/* GLint isDirectional[] = { 1, 0, 0, 0 };						// För punktkällor (0) är positionen en position. */
+/* Point3D lightSourcesDirectionsPositions[] = */ 
+/* {   { 0.58f, 0.58f, 0.58f },	// Vitt ljus (riktat). */
+/*     { 0.0f, 0.0f, 0.0f },		// Inget ljus. */
+/*     { 0.0f, 0.0f, 0.0f },		// Inget ljus. */
+/*     { 0.0f, 0.0f, 0.0f } */
+/* };		// Inget ljus. */
 // ----------------------------------------------------------
 // -------------------------------------------------------------
 
@@ -148,10 +166,14 @@ void init(void)
     printError("GL inits");
 
     // Ladda och kompilera shaders.
-    phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");					// Renderar ljus (enligt Phong-modellen).
+    phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");      // Renderar ljus (enligt Phong-modellen).
+    zshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar djupvärden till z-buffer
+    ptshader = loadShaders("shaders/passthrough.vert", "shaders/passthrough.frag");	// Renderar djuptextur till skärm
+
+    // Init z_fbo
+    z_fbo = initFBO2(width, height, 0, 1);
 
     printError("init shader");
-
 
     // Laddning av modeller.
     model1 = LoadModelPlus((char*)"objects/bunnyplus.obj");
@@ -162,18 +184,26 @@ void init(void)
 
     squareTrans = glm::scale(glm::mat4(), glm::vec3(20,20,20));
     squareTrans = glm::translate(glm::vec3(0,-10,0)) * squareTrans;
+    squareTrans = glm::rotate(squareTrans, float(PI/2.0), glm::vec3(1,0,0));
 
-    // ------Ladda upp info om ljuskällorna till phongshadern-------
-    glUseProgram(phongshader);
-    glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesDirPosArr"), NUM_LIGHTS, &lightSourcesDirectionsPositions[0].x);
-    glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesColorArr"), NUM_LIGHTS, &lightSourcesColorsArr[0].x);
-    glUniform1fv(glGetUniformLocation(phongshader, "specularExponent"), NUM_LIGHTS, specularExponent);
-    glUniform1iv(glGetUniformLocation(phongshader, "isDirectional"), NUM_LIGHTS, isDirectional);
-    glActiveTexture(GL_TEXTURE0);
-    // -------------------------------------------------------------
+    // Scale and bias för shadow map
+    scale_bias = glm::scale(glm::translate(glm::vec3(1, 1, 0)), glm::vec3(0.5, 0.5, 1));
+    
+
+    /* // ------Ladda upp info om ljuskällorna till phongshadern------- */
+    /* glUseProgram(phongshader); */
+    /* glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesDirPosArr"), NUM_LIGHTS, &lightSourcesDirectionsPositions[0].x); */
+    /* glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesColorArr"), NUM_LIGHTS, &lightSourcesColorsArr[0].x); */
+    /* glUniform1fv(glGetUniformLocation(phongshader, "specularExponent"), NUM_LIGHTS, specularExponent); */
+    /* glUniform1iv(glGetUniformLocation(phongshader, "isDirectional"), NUM_LIGHTS, isDirectional); */
+    /* glActiveTexture(GL_TEXTURE0); */
+    /* // ------------------------------------------------------------- */
+    
+    glUseProgram(zshader);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(scale_bias));
 
     // Initiell placering och orientering av kamera.
-    cam = Camera(phongshader, &viewMatrix);
+    cam = Camera(zshader, &viewMatrix);
 
     // SDL för att dölja mus och låsa den till fönstret
     SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -184,33 +214,41 @@ void display(void)
 {
     // Rensa framebuffer & z-buffer.
     glClearColor(0.1, 0.1, 0.3, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Aktivera shaderprogrammet.
-    glUseProgram(phongshader);
+    glUseProgram(zshader);
+    useFBO(z_fbo, 0L, 0L);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Öka tidsvariabeln t.
     //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
     glm::mat4 bunnyTotal = bunnyTrans;
 
-    // Uppladdning av matriser och annan data till phongshadern.
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
-    glUniform1i(glGetUniformLocation(phongshader, "texUnit"), 0);
+    // Uppladdning av matriser och annan data till shadern.
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
-    // Aktivera z-buffering (inför Phong shading).
+    // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
-    // Aktivera backface culling.
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // ----------------Scenen renderas till skärmen ----------------
-    DrawModel(model1, phongshader, "in_Position", "in_Normal", NULL);
+    // ----------------Scenen renderas till z-buffern ----------------
+    DrawModel(model1, zshader, "in_Position", "in_Normal", NULL);
+    glDisable(GL_CULL_FACE);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
+    DrawModel(squareModel, zshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
     
-    glUniformMatrix4fv(glGetUniformLocation(phongshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
-    DrawModel(squareModel, phongshader, "in_Position", "in_Normal", NULL);
+    glUseProgram(ptshader);
+    useFBO(0L, z_fbo, 0L);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // ----------------Scenen renderas till skärmen ----------------
+    glUniform1i(glGetUniformLocation(ptshader, "texUnit"), 0);
+    DrawModel(squareModel, ptshader, "in_Position", NULL, "in_TexCoord");
+    // -------------------------------------------------------------
 
     swap_buffers();
 }
@@ -288,7 +326,8 @@ void handle_userevent(SDL_Event event)
 }
 
 // Hantera knapptryckningar
-void handle_keypress(SDL_Event event){
+void handle_keypress(SDL_Event event)
+{
     switch(event.key.keysym.sym){
 	case SDLK_ESCAPE:
 	case SDLK_q:
@@ -305,7 +344,8 @@ void handle_keypress(SDL_Event event){
     }
 }
 
-void handle_mouse(SDL_Event event){
+void handle_mouse(SDL_Event event)
+{
     get_window_size(&width, &height);
     cam.change_look_at_pos(event.motion.xrel,event.motion.y,width,height);
 }
@@ -327,8 +367,8 @@ void check_keys()
 
 int main(int argc, char *argv[])
 {
-    init_SDL((const char*) "TSBK03 Projekt SDL", 640, 480);
-    reshape(640, 480, &projectionMatrix);
+    init_SDL((const char*) "TSBK03 Projekt SDL", width, height);
+    reshape(width, height, &projectionMatrix);
     init();
     SDL_TimerID timer_id;
     timer_id = SDL_AddTimer(30, &display_timer, NULL);
