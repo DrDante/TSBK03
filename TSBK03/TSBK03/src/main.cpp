@@ -132,6 +132,22 @@ int height = 480;
 // ----------------------------------------------------------
 // -------------------------------------------------------------
 
+// --------------------Ljuskälla-----------------------------
+class lightSource 
+{
+    public:
+	glm::vec3 pos;
+	bool positional;
+	glm::vec3 look_at;
+
+	lightSource(glm::vec3 pos, bool positional, glm::vec3 look_at):
+	    pos(pos), positional(positional), look_at(look_at) {}
+	lightSource() = delete;
+
+};
+
+lightSource spotlight(glm::vec3(0,10,10), false, glm::vec3(0,5,-5));
+
 // --------------------Function declarations--------------------
 void OnTimer(int value);
 void reshape(int w, int h, glm::mat4 &projectionMatrix);
@@ -223,15 +239,24 @@ void display(void)
     //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
     glm::mat4 bunnyTotal = bunnyTrans;
 
-    // Uppladdning av matriser och annan data till shadern.
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
+    // Flytta kamera till ljuskällan
+    glm::vec3 tmp_cam_pos = cam.position;
+    glm::vec3 tmp_cam_look_at = cam.look_at_pos;
+
+    cam.position = spotlight.pos;
+    cam.look_at_pos = spotlight.look_at;
+    cam.update();
+
+    // Uppladdning av matriser och annan data till shadern.
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
     // ----------------Scenen renderas till z-buffern ----------------
     DrawModel(model1, zshader, "in_Position", "in_Normal", NULL);
@@ -239,6 +264,10 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
     DrawModel(squareModel, zshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
+    
+    // Återställ kameran till ursprungsposition
+    cam.position = tmp_cam_pos;
+    cam.look_at_pos = tmp_cam_look_at;
     
     glUseProgram(ptshader);
     useFBO(0L, z_fbo, 0L);

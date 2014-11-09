@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include"common/VectorUtils3.h"
+#include <GL/gl.h>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -31,7 +31,6 @@ class Camera {
         void strafe(float d);
         void update();
         float radius;
-        void point_to(vec3 pos);
         void upload();
         void print_matrix(glm::mat4 m);
 
