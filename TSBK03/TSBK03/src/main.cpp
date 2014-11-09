@@ -98,7 +98,7 @@ GLfloat squareNormals[] =
 // Kamera (ersätter zpr)
 Camera cam;
 // Matriser.
-mat4 projectionMatrix;
+glm::mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 bunnyTrans;
 glm::mat4 squareTrans;
@@ -135,7 +135,7 @@ int height = 480;
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
-void reshape(int w, int h, mat4 *projectionMatrix);
+void reshape(int w, int h, glm::mat4 &projectionMatrix);
 void idle();
 
 
@@ -225,7 +225,7 @@ void display(void)
     glm::mat4 bunnyTotal = bunnyTrans;
 
     // Uppladdning av matriser och annan data till shadern.
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_TRUE, projectionMatrix.m);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
@@ -298,7 +298,7 @@ void event_handler(SDL_Event event)
 		case SDL_WINDOWEVENT_RESIZED:
 		    get_window_size(&width, &height);
 		    resize_window(event);
-		    reshape(width, height, &projectionMatrix);
+		    reshape(width, height, projectionMatrix);
 		    break;
 	    } 
 	    break;
@@ -368,7 +368,7 @@ void check_keys()
 int main(int argc, char *argv[])
 {
     init_SDL((const char*) "TSBK03 Projekt SDL", width, height);
-    reshape(width, height, &projectionMatrix);
+    reshape(width, height, projectionMatrix);
     init();
     SDL_TimerID timer_id;
     timer_id = SDL_AddTimer(30, &display_timer, NULL);
@@ -383,10 +383,10 @@ int main(int argc, char *argv[])
 
 // --------------------Function definitions---------------------
 // -----------------Ingemars hjälpfunktioner-----------------
-void reshape(int w, int h, mat4 *projectionMatrix)
+void reshape(int w, int h, glm::mat4 &projectionMatrix)
 {
     glViewport(0, 0, w, h);
-    GLfloat ratio = (GLfloat)w / (GLfloat)h;
-    *projectionMatrix = perspective(90, ratio, 1.0, 1000);
+    float ratio = (GLfloat)w / (GLfloat)h;
+    projectionMatrix = glm::perspective(PI/2, ratio, 1.0f, 1000.0f);
 }
 // ----------------------------------------------------------
