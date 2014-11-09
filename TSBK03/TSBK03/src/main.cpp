@@ -38,7 +38,6 @@ GLenum err;
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "common/VectorUtils3.h"
 #include "common/GL_utilities.h"
 #include "common/loadobj.h"
 #include "common/LoadTGA.h"
