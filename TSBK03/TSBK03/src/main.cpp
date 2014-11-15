@@ -61,7 +61,7 @@ GLenum err;
 
 // ---------------------------Globals---------------------------
 // Modeller.
-Model *model1, *squareModel;
+Model *bunnyModel, *squareModel;
 GLfloat square[] = 
 { 
     -1, -1, 0,
@@ -107,7 +107,7 @@ glm::mat4 scale_bias;
 FBOstruct *z_fbo;
 
 // Shaders.
-GLuint phongshader = 0, zshader = 0, ptshader = 0; // passthrough shader;
+GLuint shadowshader = 0, zshader = 0, ptshader = 0; // passthrough shader;
 // Skärmstorlek
 int width = 640; 
 int height = 480; 
@@ -146,7 +146,7 @@ class lightSource
 
 };
 
-lightSource spotlight(glm::vec3(0,10,10), false, glm::vec3(0,5,-5));
+lightSource spotlight(glm::vec3(0,10,10), false, glm::vec3(0,0,0));
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
@@ -181,17 +181,17 @@ void init(void)
     printError("GL inits");
 
     // Ladda och kompilera shaders.
-    phongshader = loadShaders("shaders/phong.vert", "shaders/phong.frag");      // Renderar ljus (enligt Phong-modellen).
-    zshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar djupvärden till z-buffer
+    zshader = loadShaders("shaders/depthbuffer.vert", "shaders/depthbuffer.frag");	// Renderar djupvärden till z-buffer
+    shadowshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar skuggor till skärm
     ptshader = loadShaders("shaders/passthrough.vert", "shaders/passthrough.frag");	// Renderar djuptextur till skärm
 
     // Init z_fbo
-    z_fbo = initFBO2(width, height, 0, 1);
+    z_fbo = init_z_fbo(width, height);
 
     printError("init shader");
 
     // Laddning av modeller.
-    model1 = LoadModelPlus((char*)"objects/bunnyplus.obj");
+    bunnyModel = LoadModelPlus((char*)"objects/bunnyplus.obj");
     squareModel = LoadDataToModel(square, squareNormals, squareTexCoord, NULL, squareIndices, 4, 6);
 
     // Initiell placering och skalning av modeller.
@@ -204,19 +204,6 @@ void init(void)
     // Scale and bias för shadow map
     scale_bias = glm::scale(glm::translate(glm::vec3(1, 1, 0)), glm::vec3(0.5, 0.5, 1));
     
-
-    /* // ------Ladda upp info om ljuskällorna till phongshadern------- */
-    /* glUseProgram(phongshader); */
-    /* glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesDirPosArr"), NUM_LIGHTS, &lightSourcesDirectionsPositions[0].x); */
-    /* glUniform3fv(glGetUniformLocation(phongshader, "lightSourcesColorArr"), NUM_LIGHTS, &lightSourcesColorsArr[0].x); */
-    /* glUniform1fv(glGetUniformLocation(phongshader, "specularExponent"), NUM_LIGHTS, specularExponent); */
-    /* glUniform1iv(glGetUniformLocation(phongshader, "isDirectional"), NUM_LIGHTS, isDirectional); */
-    /* glActiveTexture(GL_TEXTURE0); */
-    /* // ------------------------------------------------------------- */
-    
-    glUseProgram(zshader);
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(scale_bias));
-
     // Initiell placering och orientering av kamera.
     cam = Camera(zshader, &viewMatrix);
 
@@ -239,7 +226,6 @@ void display(void)
     //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
     glm::mat4 bunnyTotal = bunnyTrans;
 
-
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -259,23 +245,41 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
     // ----------------Scenen renderas till z-buffern ----------------
-    DrawModel(model1, zshader, "in_Position", "in_Normal", NULL);
-    glDisable(GL_CULL_FACE);
+    DrawModel(bunnyModel, zshader, "in_Position", "in_Normal", NULL);
     glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
     DrawModel(squareModel, zshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
+
+    glm::mat4 textureMatrix = scale_bias * projectionMatrix * viewMatrix;
     
     // Återställ kameran till ursprungsposition
     cam.position = tmp_cam_pos;
     cam.look_at_pos = tmp_cam_look_at;
+    cam.update();
     
-    glUseProgram(ptshader);
+    glUseProgram(shadowshader);
     useFBO(0L, z_fbo, 0L);
+    glDisable(GL_CULL_FACE);
+
+    glm::mat4 textureMatrixTot = textureMatrix * bunnyTotal;
+
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // ----------------Scenen renderas till skärmen ----------------
-    glUniform1i(glGetUniformLocation(ptshader, "texUnit"), 0);
-    DrawModel(squareModel, ptshader, "in_Position", NULL, "in_TexCoord");
+    // ----------------Scenen renderas till skärmen  ----------------
+    glUniform1i(glGetUniformLocation(shadowshader, "texUnit"), 0);
+
+    DrawModel(bunnyModel, shadowshader, "in_Position", "in_Normal", NULL);
+
+
+    textureMatrixTot = textureMatrix * squareTrans; 
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
+    DrawModel(squareModel, shadowshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
 
     swap_buffers();
