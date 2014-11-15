@@ -144,6 +144,10 @@ class lightSource
 	    pos(pos), positional(positional), look_at(look_at) {}
 	lightSource() = delete;
 
+	glm::vec3 move(glm::vec3 v){
+	    pos += v;
+	    return pos;
+	}
 };
 
 lightSource spotlight(glm::vec3(0,10,10), false, glm::vec3(0,0,0));
@@ -228,8 +232,8 @@ void display(void)
 
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    /* glEnable(GL_CULL_FACE); */
+    /* glCullFace(GL_BACK); */
 
     // Flytta kamera till ljuskällan
     glm::vec3 tmp_cam_pos = cam.position;
@@ -370,6 +374,18 @@ void handle_keypress(SDL_Event event)
 	    break;
 	case SDLK_h:
 	    SDL_SetRelativeMouseMode(SDL_TRUE);
+	    break;
+	case SDLK_UP:
+	    spotlight.move(glm::vec3(0,0,-1));
+	    break;
+	case SDLK_DOWN:
+	    spotlight.move(glm::vec3(0,0,1));
+	    break;
+	case SDLK_LEFT:
+	    spotlight.move(glm::vec3(-1,0,0));
+	    break;
+	case SDLK_RIGHT:
+	    spotlight.move(glm::vec3(1,0,0));
 	    break;
 	default: 
 	    break;
