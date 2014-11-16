@@ -36,8 +36,8 @@
 // ---------------------------Defines---------------------------
 #define PI 3.14159265358979323846
 // Bredd och höjd.
-#define W 512
-#define H 512
+#define W 1080
+#define H 1080
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
 // Antal lågpassfilter.
