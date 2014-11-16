@@ -1,5 +1,12 @@
 #ifndef SDL_UTIL_H
 #define SDL_UTIL_H
+#ifdef _WIN32
+// MS
+#include <gl/glew.h>
+#else
+// Linux
+#include <GL/gl.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

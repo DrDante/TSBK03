@@ -36,9 +36,6 @@
     <ClCompile Include="src\common\SDL_util.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\VectorUtils3.c">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\camera.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -86,9 +83,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\common\SDL_util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\VectorUtils3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\camera.h">

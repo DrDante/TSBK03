@@ -1,7 +1,17 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#ifdef _WIN32
+// MS
+#include <gl/glew.h>
+#else
+// Linux
 #include <GL/gl.h>
+#endif
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

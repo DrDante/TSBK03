@@ -1,6 +1,5 @@
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "SDL_util.h"
+#include <stdio.h>
 
 SDL_Window* screen ;
 SDL_GLContext glcontext;

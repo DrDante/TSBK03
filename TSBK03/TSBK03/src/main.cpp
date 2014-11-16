@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
 #include <iostream>
 
 #ifdef _WIN32
@@ -19,13 +18,12 @@
 //#include <windows.h>
 #include <gl/glew.h>
 // Glew initialization... thing.
-#include <gl/freeglut.h>
 GLenum err;
 #else
 // Linux
 #include <GL/gl.h>
-#include <GL/freeglut.h>
 #endif
+#include <SDL2/SDL.h>
 
 // För att glm inte ska skrika i kompilering
 #define GLM_FORCE_RADIANS
