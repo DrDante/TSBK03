@@ -99,38 +99,24 @@ Camera cam;
 // Matriser.
 glm::mat4 projectionMatrix;
 glm::mat4 viewMatrix;
+glm::mat4 scaleBiasMatrix;
 glm::mat4 bunnyTrans;
 glm::mat4 squareTrans;
-glm::mat4 scale_bias;
 
 // FBO
 FBOstruct *z_fbo;
 
 // Shaders.
-GLuint shadowshader = 0, zshader = 0, ptshader = 0; // passthrough shader;
+GLuint shadowshader = 0, zshader = 0; // passthrough shader;
 // Skärmstorlek
 int width = 640; 
 int height = 480; 
 // Övrigt.
-//GLfloat t = 0;	// Tidsvariabel.
 
-// ------------------------Ljuskällor------------------------
-/* Point3D lightSourcesColorsArr[] = */ 
-/* {   { 1.0f, 1.0f, 1.0f },	// Vitt ljus. */
-/*     { 0.0f, 0.0f, 0.0f },	// Inget ljus. */
-/*     { 0.0f, 0.0f, 0.0f },	// Inget ljus. */
-/*     { 0.0f, 0.0f, 0.0f } */
-/* };	// Inget ljus. */
-/* GLfloat specularExponent[] = { 150.0, 0.0, 0.0, 0.0 };		// Spekulär exponent, bör ändras till objektberoende. */
-/* GLint isDirectional[] = { 1, 0, 0, 0 };						// För punktkällor (0) är positionen en position. */
-/* Point3D lightSourcesDirectionsPositions[] = */ 
-/* {   { 0.58f, 0.58f, 0.58f },	// Vitt ljus (riktat). */
-/*     { 0.0f, 0.0f, 0.0f },		// Inget ljus. */
-/*     { 0.0f, 0.0f, 0.0f },		// Inget ljus. */
-/*     { 0.0f, 0.0f, 0.0f } */
-/* };		// Inget ljus. */
-// ----------------------------------------------------------
-// -------------------------------------------------------------
+// Bias som används för att undvika skuggacne, används i shadow_1.frag
+float bias = 0.001;
+
+//GLfloat t = 0;	// Tidsvariabel.
 
 // --------------------Ljuskälla-----------------------------
 class lightSource 
@@ -187,7 +173,6 @@ void init(void)
     // Ladda och kompilera shaders.
     zshader = loadShaders("shaders/depthbuffer.vert", "shaders/depthbuffer.frag");	// Renderar djupvärden till z-buffer
     shadowshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar skuggor till skärm
-    ptshader = loadShaders("shaders/passthrough.vert", "shaders/passthrough.frag");	// Renderar djuptextur till skärm
 
     // Init z_fbo
     z_fbo = init_z_fbo(width, height);
@@ -206,8 +191,8 @@ void init(void)
     squareTrans = glm::rotate(squareTrans, float(PI/2.0), glm::vec3(1,0,0));
 
     // Scale and bias för shadow map
-    scale_bias = glm::scale(glm::translate(glm::vec3(1, 1, 0)), glm::vec3(0.5, 0.5, 1));
-    
+    scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
+
     // Initiell placering och orientering av kamera.
     cam = Camera(zshader, &viewMatrix);
 
@@ -232,8 +217,8 @@ void display(void)
 
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
-    /* glEnable(GL_CULL_FACE); */
-    /* glCullFace(GL_BACK); */
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // Flytta kamera till ljuskällan
     glm::vec3 tmp_cam_pos = cam.position;
@@ -254,7 +239,8 @@ void display(void)
     DrawModel(squareModel, zshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
 
-    glm::mat4 textureMatrix = scale_bias * projectionMatrix * viewMatrix;
+    glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
+    /* glm::mat4 textureMatrix = projectionMatrix * viewMatrix; */
     
     // Återställ kameran till ursprungsposition
     cam.position = tmp_cam_pos;
@@ -265,20 +251,22 @@ void display(void)
     useFBO(0L, z_fbo, 0L);
     glDisable(GL_CULL_FACE);
 
-    glm::mat4 textureMatrixTot = textureMatrix * bunnyTotal;
 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
+    glUniform1f(glGetUniformLocation(shadowshader, "bias"), bias);
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // ----------------Scenen renderas till skärmen  ----------------
+   
     glUniform1i(glGetUniformLocation(shadowshader, "texUnit"), 0);
 
+    glm::mat4 textureMatrixTot = textureMatrix * bunnyTotal;
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
     DrawModel(bunnyModel, shadowshader, "in_Position", "in_Normal", NULL);
-
 
     textureMatrixTot = textureMatrix * squareTrans; 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
@@ -386,6 +374,30 @@ void handle_keypress(SDL_Event event)
 	    break;
 	case SDLK_RIGHT:
 	    spotlight.move(glm::vec3(1,0,0));
+	    break;
+	case SDLK_KP_PLUS:
+	    spotlight.move(glm::vec3(0,1,0));
+	    break;
+	case SDLK_KP_MINUS:
+	    spotlight.move(glm::vec3(0,-1,0));
+	    break;
+	// Print camera position for debugging
+	case SDLK_p:
+	    std::cout << "Camera position: " << cam.position.x << ", " << cam.position.y << ", " << cam.position.z << std::endl;
+	    break;
+	// Print spotlight position for debugging
+	case SDLK_l:
+	    std::cout << "Spotlight position: " << spotlight.pos.x << ", " << spotlight.pos.y << ", " << spotlight.pos.z << std::endl;
+	    break;
+	// Öka bias
+	case SDLK_b:
+	    bias += 0.0001;
+	    std::cout << bias << std::endl;
+	    break;
+	// Minska bias
+	case SDLK_n:
+	    bias -= 0.0001;
+	    std::cout << bias << std::endl;
 	    break;
 	default: 
 	    break;
