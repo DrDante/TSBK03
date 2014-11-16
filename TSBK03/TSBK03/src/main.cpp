@@ -218,7 +218,7 @@ void display(void)
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glCullFace(GL_FRONT);
 
     // Flytta kamera till ljuskällan
     glm::vec3 tmp_cam_pos = cam.position;
@@ -240,7 +240,6 @@ void display(void)
     // -------------------------------------------------------------
 
     glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
-    /* glm::mat4 textureMatrix = projectionMatrix * viewMatrix; */
     
     // Återställ kameran till ursprungsposition
     cam.position = tmp_cam_pos;
@@ -249,7 +248,7 @@ void display(void)
     
     glUseProgram(shadowshader);
     useFBO(0L, z_fbo, 0L);
-    glDisable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
