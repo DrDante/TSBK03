@@ -16,31 +16,72 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{687be34c-c385-4d2a-96c3-074b90b5ccf4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Common">
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{2d0ab2c9-b90e-4241-9054-6b7c89dd7db5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\Common">
       <UniqueIdentifier>{abf9143a-9ae4-4c71-850f-db22baeb6375}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="common\GL_utilities.c">
-      <Filter>Source Files\Common</Filter>
+    <ClCompile Include="src\common\GL_utilities.c">
+      <Filter>Source Files\src\Common</Filter>
     </ClCompile>
-    <ClCompile Include="common\loadobj.cpp">
-      <Filter>Source Files\Common</Filter>
+    <ClCompile Include="src\common\loadobj.cpp">
+      <Filter>Source Files\src\Common</Filter>
     </ClCompile>
-    <ClCompile Include="common\LoadTGA.cpp">
-      <Filter>Source Files\Common</Filter>
+    <ClCompile Include="src\common\LoadTGA.cpp">
+      <Filter>Source Files\src\Common</Filter>
     </ClCompile>
-    <ClCompile Include="common\zpr.c">
-      <Filter>Source Files\Common</Filter>
+    <ClCompile Include="src\common\SDL_util.c">
+      <Filter>Source Files\src\Common</Filter>
     </ClCompile>
-    <ClCompile Include="common\VectorUtils3.c">
-      <Filter>Source Files\Common</Filter>
+    <ClCompile Include="src\camera.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shadow_map.cpp">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common\GL_utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\loadobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\LoadTGA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\SDL_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shadow_map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\addtextures.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\depthbuffer.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\depthbuffer.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\passthrough.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\passthrough.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
     <None Include="shaders\phong.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -50,43 +91,11 @@
     <None Include="shaders\plaintextureshader.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\threshold.frag">
+    <None Include="shaders\shadow_1.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\addtextures.frag">
+    <None Include="shaders\shadow_1.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\lowpassx.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\lowpassy.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\diag1.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\diag2.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="shaders\passthrough.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="common\GL_utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\loadobj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\LoadTGA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\zpr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\VectorUtils3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

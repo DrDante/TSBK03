@@ -84,7 +84,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;freeglut.lib;glew32.lib;glew32s.lib;glew32mx.lib;glew32mxs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;freeglut.lib;glew32.lib;glew32s.lib;glew32mx.lib;glew32mxs.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,31 +117,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="common\GL_utilities.c" />
-    <ClCompile Include="common\loadobj.cpp" />
-    <ClCompile Include="common\LoadTGA.cpp" />
-    <ClCompile Include="common\VectorUtils3.c" />
-    <ClCompile Include="common\zpr.c" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\common\GL_utilities.c" />
+    <ClCompile Include="src\common\loadobj.cpp" />
+    <ClCompile Include="src\common\LoadTGA.cpp" />
+    <ClCompile Include="src\common\SDL_util.c" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\shadow_map.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\common\GL_utilities.h" />
+    <ClInclude Include="src\common\loadobj.h" />
+    <ClInclude Include="src\common\LoadTGA.h" />
+    <ClInclude Include="src\common\SDL_util.h" />
+    <ClInclude Include="src\shadow_map.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\addtextures.frag" />
-    <None Include="shaders\diag1.frag" />
-    <None Include="shaders\diag2.frag" />
-    <None Include="shaders\lowpassx.frag" />
-    <None Include="shaders\lowpassy.frag" />
+    <None Include="shaders\depthbuffer.frag" />
+    <None Include="shaders\depthbuffer.vert" />
+    <None Include="shaders\passthrough.frag" />
     <None Include="shaders\passthrough.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\phong.vert" />
     <None Include="shaders\plaintextureshader.frag" />
-    <None Include="shaders\threshold.frag" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="common\GL_utilities.h" />
-    <ClInclude Include="common\loadobj.h" />
-    <ClInclude Include="common\LoadTGA.h" />
-    <ClInclude Include="common\VectorUtils3.h" />
-    <ClInclude Include="common\zpr.h" />
+    <None Include="shaders\shadow_1.frag" />
+    <None Include="shaders\shadow_1.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

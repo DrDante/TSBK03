@@ -22,21 +22,16 @@ out vec3 tempLightDir;
 // ----------------------------------------------------------------------------------------
 
 // Nedanstående bör fixas.
-//mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix)));
-//mat3 normalTransformMatrix = inverse(transpose(mat3(WTVMatrix * MTWMatrix)));
-mat3 normalTransformMatrix = mat3(WTVMatrix * MTWMatrix);
+/* mat3 normalTransformMatrix = transpose(inverse(mat3(WTVMatrix * MTWMatrix))); */
+/* mat3 normalTransformMatrix = inverse(transpose(mat3(WTVMatrix * MTWMatrix))); */
+/* mat3 normalTransformMatrix = mat3(WTVMatrix * MTWMatrix); */
+mat3 normalTransformMatrix = mat3(MTWMatrix);
 
 void main(void)
 {
 	gl_Position = VTPMatrix * WTVMatrix * MTWMatrix * vec4(in_Position, 1.0);
 	//out_TexCoord = in_TexCoord;
 	outNormal = normalTransformMatrix * in_Normal;
-	
-	vec3 temp = vec3(camPos[0], camPos[1], camPos[2]);
-	outCamPos = temp;
+	outCamPos = camPos;
 	outObjPos = vec3(MTWMatrix * vec4(in_Position, 1));
-
-	// ------------------------------------------USCH------------------------------------------
-	tempLightDir = mat3(WTVMatrix) * lightSourcesDirPosArr[0];
-	// ----------------------------------------------------------------------------------------
 }
