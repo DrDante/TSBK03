@@ -112,7 +112,7 @@ int height = 480;
 // Övrigt.
 
 // Bias som används för att undvika skuggacne, används i shadow_1.frag
-float bias = 0.001;
+float bias = 0.0015;
 
 //GLfloat t = 0;	// Tidsvariabel.
 
