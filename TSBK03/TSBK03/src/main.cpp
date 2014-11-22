@@ -46,9 +46,10 @@ GLenum err;
 
 // ---------------------------Defines---------------------------
 #define PI 3.14159265358979323846f
-// Bredd och höjd.
-#define W 512
-#define H 512
+
+// Bredd och höjd på djuptextur
+#define SHADOW_W 1024
+#define SHADOW_H 1024
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
 
@@ -174,11 +175,11 @@ void init(void)
 
     // Init z_fbo
     // Ändra width och height för bättre upplösning på skuggor!
-    z_fbo = init_z_fbo(1024, 1024);
+    z_fbo = init_z_fbo(SHADOW_W, SHADOW_H);
 
     // Ladda upp hur står ändring i texturen en pixel är
     glUseProgram(shadowshader);
-    glm::vec2 pixelDiff = glm::vec2(1.0/1024.0, 1.0/1024.0);
+    glm::vec2 pixelDiff = glm::vec2(1.0/SHADOW_W, 1.0/SHADOW_H);
     glUniform2f(glGetUniformLocation(shadowshader, "pixelDiff"), pixelDiff.x, pixelDiff.y);
     
 
