@@ -176,6 +176,12 @@ void init(void)
     // Ändra width och height för bättre upplösning på skuggor!
     z_fbo = init_z_fbo(1024, 1024);
 
+    // Ladda upp hur står ändring i texturen en pixel är
+    glUseProgram(shadowshader);
+    glm::vec2 pixelDiff = glm::vec2(1.0/1024.0, 1.0/1024.0);
+    glUniform2f(glGetUniformLocation(shadowshader, "pixelDiff"), pixelDiff.x, pixelDiff.y);
+    
+
     printError("init shader");
 
     // Laddning av modeller.
