@@ -173,6 +173,7 @@ void init(void)
     shadowshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar skuggor till skärm
 
     // Init z_fbo
+    // Ändra width och height för bättre upplösning på skuggor!
     z_fbo = init_z_fbo(width, height);
 
     printError("init shader");
