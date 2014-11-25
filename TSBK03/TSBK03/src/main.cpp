@@ -60,7 +60,7 @@ GLenum err;
 
 // ---------------------------Globals---------------------------
 // Modeller.
-Model *bunnyModel, *squareModel;
+Model *bunnyModel, *squareModel, *groundModel;
 GLfloat square[] = 
 { 
     -1, -1, 0,
@@ -101,6 +101,8 @@ glm::mat4 viewMatrix;
 glm::mat4 scaleBiasMatrix;
 glm::mat4 bunnyTrans;
 glm::mat4 squareTrans;
+glm::mat4 groundTrans;
+glm::mat4 wallTrans;
 
 // FBO
 FBOstruct *z_fbo;
@@ -133,6 +135,8 @@ class lightSource
 	    pos += v;
 	    return pos;
 	}
+
+	glm::mat4 projectionMatrix;
 };
 
 lightSource spotlight(glm::vec3(0,10,10), false, glm::vec3(0,0,0));
@@ -187,6 +191,7 @@ void init(void)
 
     // Laddning av modeller.
     bunnyModel = LoadModelPlus((char*)"objects/bunnyplus.obj");
+    groundModel = LoadModelPlus((char*)"objects/ground.obj");
     squareModel = LoadDataToModel(square, squareNormals, squareTexCoord, NULL, squareIndices, 4, 6);
 
     // Initiell placering och skalning av modeller.
@@ -196,6 +201,13 @@ void init(void)
     squareTrans = glm::translate(glm::vec3(0,-10,0)) * squareTrans;
     squareTrans = glm::rotate(squareTrans, float(PI/2.0), glm::vec3(1,0,0));
 
+    groundTrans = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    groundTrans = glm::translate(glm::vec3(0,-10,0)) * groundTrans;
+
+    wallTrans = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    wallTrans = glm::rotate(wallTrans, float(PI/2.0), glm::vec3(1,0,0));
+    wallTrans = glm::translate(glm::vec3(0,9.9,-20)) * wallTrans;
+
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
 
@@ -204,8 +216,11 @@ void init(void)
 
     // SDL för att dölja mus och låsa den till fönstret
     SDL_SetRelativeMouseMode(SDL_TRUE);
-}
 
+    // Sätt spotlights projektionsmatrix
+    spotlight.projectionMatrix = glm::perspective(PI/2, float(width)/height, 1.0f, 1000.0f);
+
+}
 
 void display(void)
 {
@@ -235,14 +250,16 @@ void display(void)
     cam.update();
 
     // Uppladdning av matriser och annan data till shadern.
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(spotlight.projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
     // ----------------Scenen renderas till z-buffern ----------------
     DrawModel(bunnyModel, zshader, "in_Position", "in_Normal", NULL);
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
-    DrawModel(squareModel, zshader, "in_Position", "in_Normal", NULL);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(groundTrans));
+    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTrans));
+    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
 
     glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
@@ -272,10 +289,15 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
     DrawModel(bunnyModel, shadowshader, "in_Position", "in_Normal", NULL);
 
-    textureMatrixTot = textureMatrix * squareTrans; 
+    textureMatrixTot = textureMatrix * groundTrans; 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(squareTrans));
-    DrawModel(squareModel, shadowshader, "in_Position", "in_Normal", NULL);
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(groundTrans));
+    DrawModel(groundModel, shadowshader, "in_Position", "in_Normal", NULL);
+
+    textureMatrixTot = textureMatrix * wallTrans; 
+    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
+    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTrans));
+    DrawModel(groundModel, shadowshader, "in_Position", "in_Normal", NULL);
     // -------------------------------------------------------------
 
     swap_buffers();
