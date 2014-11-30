@@ -1,17 +1,23 @@
 #include "shadow_map.hpp"
 
-FBOstruct *init_z_fbo(int width, int height)
+ShadowMapFBO::ShadowMapFBO()
 {
-    FBOstruct *fbo = (FBOstruct*)malloc(sizeof(FBOstruct));
+    m_fbo = 0;
+    m_shadowMap = 0;
+}
 
-    fbo->width = width;
-    fbo->height = height;
+ShadowMapFBO::~ShadowMapFBO()
+{
+    m_fbo = 0;
+    m_shadowMap = 0;
+}
 
-    // create objects
-    glGenFramebuffers(1, &fbo->fb); // frame buffer id
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo->fb);
-    glGenTextures(1, &fbo->texid);
-    glBindTexture(GL_TEXTURE_2D, fbo->texid);
+bool ShadowMapFBO::init(int width, int height)
+{
+    glGenFramebuffers(1, &m_fbo); // frame buffer id
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glGenTextures(1, &m_shadowMap);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -21,13 +27,25 @@ FBOstruct *init_z_fbo(int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->texid, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadowMap, 0);
     glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-	std::cerr << "ERROR intializing z_fbo: " << width << " x " << height << std::endl;
-    }
+    this->width = width;
+    this->height = height;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    return fbo;
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE;
+}
+
+void ShadowMapFBO::bind_for_writing()
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glViewport(0,0,width,height);
+}
+
+void ShadowMapFBO::bind_for_reading(GLenum TextureUnit)
+{
+    glActiveTexture(TextureUnit);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
 }
