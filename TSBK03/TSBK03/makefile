@@ -11,9 +11,9 @@ CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES
 CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES
 
 
-LIB = GL m X11 SDL2
+LIB = GL m X11
 
-LDXFLAGS = $(addprefix -l,$(LIB)) `sdl-config --libs`
+LDXFLAGS = $(addprefix -l,$(LIB)) `sdl2-config --libs`
 
 CSOURCES = $(wildcard $(SRC)/*.c) $(wildcard $(SRC)/common/*.c)
 CXSOURCES = $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/common/*.cpp)
