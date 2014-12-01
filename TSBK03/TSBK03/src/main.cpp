@@ -48,8 +48,8 @@ GLenum err;
 #define PI 3.14159265358979323846f
 
 // Bredd och höjd på djuptextur
-#define SHADOW_W 1024
-#define SHADOW_H 1024
+#define SHADOW_W 2048
+#define SHADOW_H 2048
 // Antal ljuskällor.
 #define NUM_LIGHTS 4
 
@@ -110,8 +110,8 @@ ShadowMapFBO z_fbo;
 // Shaders.
 GLuint shadowshader = 0, zshader = 0; // passthrough shader;
 // Skärmstorlek
-int width = 640; 
-int height = 480; 
+int width = 1024; 
+int height = 768; 
 // Övrigt.
 
 // Bias som används för att undvika skuggacne, används i shadow_1.frag
@@ -139,7 +139,7 @@ class lightSource
 	glm::mat4 projectionMatrix;
 };
 
-lightSource spotlight(glm::vec3(-10,10,10), false, glm::vec3(0,0,0));
+lightSource spotlight(glm::vec3(-18,7,20), false, glm::vec3(0,0,0));
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
