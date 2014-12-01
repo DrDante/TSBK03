@@ -36,6 +36,7 @@ GLenum err;
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "objects.hpp"
 #include "common/GL_utilities.h"
 #include "common/loadobj.h"
 #include "common/LoadTGA.h"
@@ -59,39 +60,11 @@ GLenum err;
 #define SPEED 2
 
 // ---------------------------Globals---------------------------
-// Modeller.
-Model *bunnyModel, *squareModel, *groundModel;
-GLfloat square[] = 
-{ 
-    -1, -1, 0,
-    -1,  1, 0,
-     1,  1, 0,
-     1, -1, 0
-};
+// Saker
+Thing bunny, ground, sidewall, backwall, sphere, torus;
 
-GLfloat squareTexCoord[] = 
-{ 
-    0, 0,
-    0, 1,
-    1, 1,
-    1, 0
-};
-
-GLuint squareIndices[] = { 0, 1, 2, 0, 2, 3 };
-
-GLfloat squareNormals[] =
-{
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0,
-	0,1,0
-};
-    
+// Model
+Model *wallModel;
 
 // Kamera (ersätter zpr)
 Camera cam;
@@ -99,10 +72,6 @@ Camera cam;
 glm::mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 scaleBiasMatrix;
-glm::mat4 bunnyTrans;
-glm::mat4 groundTrans;
-glm::mat4 wallTransBack;
-glm::mat4 wallTransSide;
 
 // FBO
 ShadowMapFBO z_fbo;
@@ -190,23 +159,28 @@ void init(void)
     printError("init shader");
 
     // Laddning av modeller.
-    bunnyModel = LoadModelPlus((char*)"objects/bunnyplus.obj");
-    groundModel = LoadModelPlus((char*)"objects/ground.obj");
-    squareModel = LoadDataToModel(square, squareNormals, squareTexCoord, NULL, squareIndices, 4, 6);
+    wallModel = LoadModelPlus((char*)"objects/ground.obj");
+    bunny = Thing("objects/bunnyplus.obj");
+    sphere = Thing("objects/sphere.obj");
+    torus = Thing("objects/torus.obj");
 
     // Initiell placering och skalning av modeller.
-    bunnyTrans = glm::scale(glm::mat4(), glm::vec3(3,3,3));
+    bunny.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(3,3,3));
 
-    groundTrans = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    groundTrans = glm::translate(glm::vec3(0,-10,0)) * groundTrans;
+    torus.MTWmatrix = glm::translate(glm::vec3(-5,-2,-4));
 
-    wallTransBack = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    wallTransBack = glm::rotate(wallTransBack, float(PI/2.0), glm::vec3(1,0,0));
-    wallTransBack = glm::translate(glm::vec3(0,9.9,-20)) * wallTransBack;
+    sphere.MTWmatrix = glm::translate(glm::vec3(5,0,-2));
 
-    wallTransSide = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    wallTransSide = glm::rotate(wallTransSide, float(PI/2.0), glm::vec3(0,0,1));
-    wallTransSide = glm::translate(glm::vec3(20,9.9,0)) * wallTransSide;
+    ground.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    ground.MTWmatrix= glm::translate(glm::vec3(0,-10,0)) * ground.MTWmatrix;
+
+    backwall.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    backwall.MTWmatrix = glm::rotate(backwall.MTWmatrix, float(PI/2.0), glm::vec3(1,0,0));
+    backwall.MTWmatrix = glm::translate(glm::vec3(0,9.9,-20)) * backwall.MTWmatrix;
+
+    sidewall.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
+    sidewall.MTWmatrix = glm::rotate(sidewall.MTWmatrix, float(PI/2.0), glm::vec3(0,0,1));
+    sidewall.MTWmatrix = glm::translate(glm::vec3(20,9.9,0)) * sidewall.MTWmatrix;
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
@@ -234,7 +208,6 @@ void display(void)
 
     // Öka tidsvariabeln t.
     //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-    glm::mat4 bunnyTotal = bunnyTrans;
 
     // Aktivera z-buffering
     glEnable(GL_DEPTH_TEST);
@@ -252,23 +225,25 @@ void display(void)
     // Uppladdning av matriser och annan data till shadern.
     glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(spotlight.projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
 
     // ----------------Scenen renderas till z-buffern ----------------
     // Rita kanin
-    DrawModel(bunnyModel, zshader, "in_Position", "in_Normal", NULL);
+    bunny.draw(zshader);
+
+    // Rita sfär
+    sphere.draw(zshader);
+
+    // Rita torus
+    torus.draw(zshader);
 
     // Rita golv
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(groundTrans));
-    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
+    ground.draw(zshader, wallModel);
 
     // Rita bakre vägg
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTransBack));
-    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
+    backwall.draw(zshader, wallModel);
 
     // Rita sidovägg
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTransSide));
-    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
+    sidewall.draw(zshader, wallModel);
     // -------------------------------------------------------------
 
     glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
@@ -285,7 +260,6 @@ void display(void)
 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(bunnyTotal));
     glUniform1f(glGetUniformLocation(shadowshader, "bias"), bias);
 
 
@@ -296,27 +270,22 @@ void display(void)
     glUniform1i(glGetUniformLocation(shadowshader, "texUnit"), 0);
 
     // Rita kanin
-    glm::mat4 textureMatrixTot = textureMatrix * bunnyTotal;
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
-    DrawModel(bunnyModel, shadowshader, "in_Position", "in_Normal", NULL);
+    bunny.draw_with_depthinfo(shadowshader, textureMatrix);
+
+    // Rita torus
+    torus.draw_with_depthinfo(shadowshader, textureMatrix);
+
+    // Rita sfär
+    sphere.draw_with_depthinfo(shadowshader, textureMatrix);
 
     // Rita golv
-    textureMatrixTot = textureMatrix * groundTrans; 
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(groundTrans));
-    DrawModel(groundModel, shadowshader, "in_Position", "in_Normal", NULL);
+    ground.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
 
     // Rita bakre vägg
-    textureMatrixTot = textureMatrix * wallTransBack; 
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTransBack));
-    DrawModel(groundModel, shadowshader, "in_Position", "in_Normal", NULL);
+    backwall.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
    
     // Rita sidovägg
-    textureMatrixTot = textureMatrix * wallTransSide; 
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "textureMatrix"), 1, GL_FALSE, glm::value_ptr(textureMatrixTot));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "MTWMatrix"), 1, GL_FALSE, glm::value_ptr(wallTransSide));
-    DrawModel(groundModel, zshader, "in_Position", "in_Normal", NULL);
+    sidewall.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
     // -------------------------------------------------------------
 
     swap_buffers();
