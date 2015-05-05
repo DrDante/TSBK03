@@ -123,6 +123,7 @@
     <ClCompile Include="src\common\LoadTGA.cpp" />
     <ClCompile Include="src\common\SDL_util.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\objects.cpp" />
     <ClCompile Include="src\shadow_map.cpp" />
   </ItemGroup>
   <ItemGroup>
