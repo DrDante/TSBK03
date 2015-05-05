@@ -72,9 +72,13 @@ Camera cam;
 glm::mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 scaleBiasMatrix;
+glm::mat4 bunnyTrans;
+glm::mat4 squareTrans;
+glm::mat4 groundTrans;
+glm::mat4 wallTrans;
 
 // FBO
-ShadowMapFBO z_fbo;
+FBOstruct *z_fbo;
 
 // Shaders.
 GLuint shadowshader = 0, zshader = 0; // passthrough shader;
@@ -148,7 +152,7 @@ void init(void)
 
     // Init z_fbo
     // Ändra width och height för bättre upplösning på skuggor!
-    z_fbo.init(SHADOW_W, SHADOW_H);
+    z_fbo = init_z_fbo(SHADOW_W, SHADOW_H);
 
     // Ladda upp hur står ändring i texturen en pixel är
     glUseProgram(shadowshader);
@@ -203,7 +207,7 @@ void display(void)
 
     // Aktivera shaderprogrammet.
     glUseProgram(zshader);
-    z_fbo.bind_for_writing();
+    useFBO(z_fbo, 0L, 0L);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Öka tidsvariabeln t.
@@ -227,6 +231,7 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
     // ----------------Scenen renderas till z-buffern ----------------
+    
     // Rita kanin
     bunny.draw(zshader);
 
@@ -254,9 +259,8 @@ void display(void)
     cam.update();
     
     glUseProgram(shadowshader);
-    z_fbo.bind_for_reading(GL_TEXTURE0);
-    glViewport(0,0,width,height);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    useFBO(0L, z_fbo, 0L);
+
 
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(glGetUniformLocation(shadowshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
