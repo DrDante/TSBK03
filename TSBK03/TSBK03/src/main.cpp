@@ -272,6 +272,16 @@ void display(void)
     // ----------------Scenen renderas till skärmen  ----------------
    
     glUniform1i(glGetUniformLocation(shadowshader, "texUnit"), 0);
+	// TODO
+	// 1 Bygg scen (Julius, blender!)
+	// 2 Bygg system för ljuskällegeometri + penumbra
+	// 2 I arbete ovan, orda objektberoende phongparametrar
+	// 3 Med planerade mängd ljuskällor, gör processen som görs per ljuskälla
+	// 4 Animering, någon slags rörelsesystem (inkl kollisionsdetection?), knappar för att stänga av ljuskällor
+	// * Lägg på bloom (och kanske motion blur?)
+	// * Putsa
+	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
+	glUniform3fv(glGetUniformLocation(shadowshader, "camPos"), 1, camPos);
 
     // Rita kanin
     bunny.draw_with_depthinfo(shadowshader, textureMatrix);
