@@ -61,10 +61,26 @@ GLenum err;
 
 // ---------------------------Globals---------------------------
 // Saker
-Thing bunny, ground, sidewall, backwall, sphere, torus;
+Thing bunny, ground, sidewall, backwall, sphere, torus, lightsrc, blend;
 
 // Model
 Model *wallModel;
+
+//---
+GLfloat square[] = {
+	-1, -1, 0,
+	-1, 1, 0,
+	1, 1, 0,
+	1, -1, 0 };
+GLfloat squareTexCoord[] = {
+	0, 0,
+	0, 1,
+	1, 1,
+	1, 0 };
+GLuint squareIndices[] = { 0, 1, 2, 0, 2, 3 };
+
+Model* squareModel;
+//---
 
 // Kamera (ersätter zpr)
 Camera cam;
@@ -76,12 +92,13 @@ glm::mat4 bunnyTrans;
 glm::mat4 squareTrans;
 glm::mat4 groundTrans;
 glm::mat4 wallTrans;
+glm::mat4 blendTrans;
 
 // FBO
-FBOstruct *z_fbo;
+FBOstruct *z_fbo, *tmp_fbo, *res_fbo;
 
 // Shaders.
-GLuint shadowshader = 0, zshader = 0; // passthrough shader;
+GLuint shadowphongshader = 0, zshader = 0, addshader = 0, plainshader = 0; // passthrough shader;
 // Skärmstorlek
 int width = 1024; 
 int height = 768; 
@@ -112,13 +129,19 @@ class lightSource
 	glm::mat4 projectionMatrix;
 };
 
-lightSource spotlight(glm::vec3(-18,7,20), false, glm::vec3(0,0,0));
+lightSource spotlight1(glm::vec3(17, 0, 3), false, glm::vec3(1, 1, 1));
+bool draw1 = 1;
+lightSource spotlight2(glm::vec3(15, -2, 13), false, glm::vec3(1, 1, 1));
+bool draw2 = 1;
+bool debugmode = 0;
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
 void reshape(int w, int h, glm::mat4 &projectionMatrix);
 void idle();
-
+void fbo_add_tmp_to_res();
+void draw_scene(lightSource light);
+void draw_lights(lightSource light);
 
 // SDL functions
 void handle_keypress(SDL_Event event);
@@ -147,17 +170,21 @@ void init(void)
     printError("GL inits");
 
     // Ladda och kompilera shaders.
-    zshader = loadShaders("shaders/depthbuffer.vert", "shaders/depthbuffer.frag");	// Renderar djupvärden till z-buffer
-    shadowshader = loadShaders("shaders/shadow_1.vert", "shaders/shadow_1.frag");	// Renderar skuggor till skärm
+    zshader = loadShaders("shaders/depthbuffer.vert", "shaders/depthbuffer.frag");				// Renderar djupvärden till z-buffer
+    shadowphongshader = loadShaders("shaders/shadowphong.vert", "shaders/shadowphong.frag");	// Renderar skuggor till skärm
+	addshader = loadShaders("shaders/passthrough.vert", "shaders/addtextures.frag");			// Adderar texturer från två fbos
+	plainshader = loadShaders("shaders/passthrough.vert", "shaders/plaintextureshader.frag");	// Ritar ut 
+	tmp_fbo = initFBO(width, height, 0);
+	res_fbo = initFBO(width, height, 0);
 
     // Init z_fbo
     // Ändra width och height för bättre upplösning på skuggor!
     z_fbo = init_z_fbo(SHADOW_W, SHADOW_H);
 
     // Ladda upp hur står ändring i texturen en pixel är
-    glUseProgram(shadowshader);
+    glUseProgram(shadowphongshader);
     glm::vec2 pixelDiff = glm::vec2(1.0/SHADOW_W, 1.0/SHADOW_H);
-    glUniform2f(glGetUniformLocation(shadowshader, "pixelDiff"), pixelDiff.x, pixelDiff.y);
+    glUniform2f(glGetUniformLocation(shadowphongshader, "pixelDiff"), pixelDiff.x, pixelDiff.y);
     
 
     printError("init shader");
@@ -167,6 +194,14 @@ void init(void)
     bunny = Thing("objects/bunnyplus.obj");
     sphere = Thing("objects/sphere.obj");
     torus = Thing("objects/torus.obj");
+
+	squareModel = LoadDataToModel(
+		square, NULL, squareTexCoord, NULL,
+		squareIndices, 4, 6);
+
+	lightsrc = Thing("objects/sphere.obj");
+
+	blend = Thing("objects/blend.obj");
 
     // Initiell placering och skalning av modeller.
     bunny.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(3,3,3));
@@ -186,6 +221,10 @@ void init(void)
     sidewall.MTWmatrix = glm::rotate(sidewall.MTWmatrix, float(PI/2.0), glm::vec3(0,0,1));
     sidewall.MTWmatrix = glm::translate(glm::vec3(20,9.9,0)) * sidewall.MTWmatrix;
 
+
+	blend.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(10, 10, 10));
+	blend.MTWmatrix = glm::translate(glm::vec3(0, -5, 0)) * blend.MTWmatrix;
+
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
 
@@ -195,83 +234,16 @@ void init(void)
     // SDL för att dölja mus och låsa den till fönstret
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    // Sätt spotlights projektionsmatrix
-    spotlight.projectionMatrix = glm::perspective(PI/2, float(width)/height, 1.0f, 1000.0f);
+    // Sätt ljuskällornas projektionsmatrix
+	glm::mat4 lightpersp = glm::perspective(float(PI / 2), float(width) / height, 1.0f, 1000.0f);
+    spotlight1.projectionMatrix = lightpersp;
+	spotlight2.projectionMatrix = lightpersp;
+	//spotlight.projectionMatrix = glm::ortho(0.0f, float(width), 0.0f, float(height), 1.0f, 1000.0f);
 
 }
 
 void display(void)
 {
-    // Rensa framebuffer & z-buffer.
-    glClearColor(0.1, 0.1, 0.3, 0);
-
-    // Aktivera shaderprogrammet.
-    glUseProgram(zshader);
-    useFBO(z_fbo, 0L, 0L);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Öka tidsvariabeln t.
-    //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-
-    // Aktivera z-buffering
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    // Flytta kamera till ljuskällan
-    glm::vec3 tmp_cam_pos = cam.position;
-    glm::vec3 tmp_cam_look_at = cam.look_at_pos;
-
-    cam.position = spotlight.pos;
-    cam.look_at_pos = spotlight.look_at;
-    cam.update();
-
-    // Uppladdning av matriser och annan data till shadern.
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(spotlight.projectionMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-    // ----------------Scenen renderas till z-buffern ----------------
-    
-    // Rita kanin
-    bunny.draw(zshader);
-
-    // Rita sfär
-    sphere.draw(zshader);
-
-    // Rita torus
-    torus.draw(zshader);
-
-    // Rita golv
-    ground.draw(zshader, wallModel);
-
-    // Rita bakre vägg
-    backwall.draw(zshader, wallModel);
-
-    // Rita sidovägg
-    sidewall.draw(zshader, wallModel);
-    // -------------------------------------------------------------
-
-    glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
-    
-    // Återställ kameran till ursprungsposition
-    cam.position = tmp_cam_pos;
-    cam.look_at_pos = tmp_cam_look_at;
-    cam.update();
-    
-    glUseProgram(shadowshader);
-    useFBO(0L, z_fbo, 0L);
-
-
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shadowshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniform1f(glGetUniformLocation(shadowshader, "bias"), bias);
-
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // ----------------Scenen renderas till skärmen  ----------------
-   
-    glUniform1i(glGetUniformLocation(shadowshader, "texUnit"), 0);
 	// TODO
 	// 1 Bygg scen (Julius, blender!)
 	// 2 Bygg system för ljuskällegeometri + penumbra
@@ -280,29 +252,187 @@ void display(void)
 	// 4 Animering, någon slags rörelsesystem (inkl kollisionsdetection?), knappar för att stänga av ljuskällor
 	// * Lägg på bloom (och kanske motion blur?)
 	// * Putsa
-	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
-	glUniform3fv(glGetUniformLocation(shadowshader, "camPos"), 1, camPos);
 
-    // Rita kanin
-    bunny.draw_with_depthinfo(shadowshader, textureMatrix);
+	// Rensa framebuffer & z-buffer.
+	glClearColor(0.0, 0.0, 0.0, 0);
+	useFBO(res_fbo, 0L, 0L);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Rita torus
-    torus.draw_with_depthinfo(shadowshader, textureMatrix);
+    // Aktivera shaderprogrammet.
+	//glUseProgram(zshader);
+	glClearColor(0.0, 0.0, 0.0, 0);
+	useFBO(tmp_fbo, 0L, 0L);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    useFBO(z_fbo, 0L, 0L);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Rita sfär
-    sphere.draw_with_depthinfo(shadowshader, textureMatrix);
+    // Öka tidsvariabeln t.
+    //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	
+	// Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo
+	if (draw1)
+	{
+		draw_scene(spotlight1);
+	}
+	if (draw2)
+	{
+		draw_scene(spotlight2);
+	}
 
-    // Rita golv
-    ground.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
+	// Rita ut ljuskällor till res_fbo
+	if (debugmode)
+	{
+		if (draw1)
+		{
+			draw_lights(spotlight1);
+		}
+		if (draw2)
+		{
+			draw_lights(spotlight2);
+		}
+	}
 
-    // Rita bakre vägg
-    backwall.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
-   
-    // Rita sidovägg
-    sidewall.draw_with_depthinfo(shadowshader, textureMatrix, wallModel);
-    // -------------------------------------------------------------
+	// Rita ut res_fbo till skärmen	
+	glUseProgram(plainshader);
+	useFBO(0L, res_fbo, 0L);
+	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");
 
     swap_buffers();
+}
+
+void fbo_add_tmp_to_res()
+{
+	// Adds two fbos (tmp_fbo and res_fbo) to res_fbo
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(addshader);
+	useFBO(res_fbo, tmp_fbo, 0L);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tmp_fbo->texid);
+	glUniform1i(glGetUniformLocation(addshader, "texUnit"), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, res_fbo->texid);
+	glUniform1i(glGetUniformLocation(addshader, "texUnit2"), 1);
+	DrawModel(squareModel, addshader, "in_Position", NULL, "in_TexCoord");
+	glActiveTexture(GL_TEXTURE0);
+}
+
+void draw_scene(lightSource light)
+{
+	glUseProgram(zshader);
+	useFBO(z_fbo, 0L, 0L);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Aktivera z-buffering
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	// Flytta kamera till ljuskällan
+	glm::vec3 tmp_cam_pos = cam.position;
+	glm::vec3 tmp_cam_look_at = cam.look_at_pos;
+
+	cam.position = light.pos;
+	cam.look_at_pos = light.look_at;
+	cam.update();
+
+	// Uppladdning av matriser och annan data till shadern.
+	glUniformMatrix4fv(glGetUniformLocation(zshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(light.projectionMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+	// ----------------Scenen renderas till z-buffern ----------------
+
+	// Rita kanin
+	bunny.draw(zshader);
+
+	// Rita sfär
+	sphere.draw(zshader);
+
+	// Rita torus
+	torus.draw(zshader);
+
+	// Rita golv
+	//ground.draw(zshader, wallModel);
+
+	// Rita bakre vägg
+	//backwall.draw(zshader, wallModel);
+
+	// Rita sidovägg
+	//sidewall.draw(zshader, wallModel);
+
+	//
+	blend.draw(zshader);
+
+	// -------------------------------------------------------------
+
+	glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
+
+	// Återställ kameran till ursprungsposition
+	cam.position = tmp_cam_pos;
+	cam.look_at_pos = tmp_cam_look_at;
+	cam.update();
+
+	glUseProgram(shadowphongshader);
+	useFBO(tmp_fbo, z_fbo, 0L);
+	
+
+	glUniformMatrix4fv(glGetUniformLocation(shadowphongshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(shadowphongshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniform3fv(glGetUniformLocation(shadowphongshader, "lPos"), 1, glm::value_ptr(light.pos));
+	glUniform1f(glGetUniformLocation(shadowphongshader, "bias"), bias);
+
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// ---------------- Scenen renderas till tmp_fbo ----------------
+
+	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
+	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
+	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
+
+	// Rita kanin
+	bunny.draw_with_depthinfo(shadowphongshader, textureMatrix);
+
+	// Rita torus
+	torus.draw_with_depthinfo(shadowphongshader, textureMatrix);
+
+	// Rita sfär
+	sphere.draw_with_depthinfo(shadowphongshader, textureMatrix);
+
+	// Rita golv
+	//ground.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
+
+	// Rita bakre vägg
+	//backwall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
+
+	// Rita sidovägg
+	//sidewall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
+
+	//
+	blend.draw_with_depthinfo(shadowphongshader, textureMatrix);
+
+	// -------------------------------------------------------------
+
+	// Scenen adderas till res_fbo
+	fbo_add_tmp_to_res();
+}
+
+void draw_lights(lightSource light)
+{
+	// Rita ut ljuskällor
+	glUseProgram(shadowphongshader);
+	useFBO(tmp_fbo, 0L, 0L);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+
+	lightsrc.MTWmatrix = glm::translate(light.pos);
+	lightsrc.draw(shadowphongshader);
+
+	// Addera till res_fbo
+	fbo_add_tmp_to_res();
 }
 
 // Timer för uppritande av skärm. Man får inte kalla funktioner här inne
@@ -391,32 +521,69 @@ void handle_keypress(SDL_Event event)
 	case SDLK_h:
 	    SDL_SetRelativeMouseMode(SDL_TRUE);
 	    break;
+	case SDLK_1:
+		draw1 = !draw1;
+		break;
+	case SDLK_2:
+		draw2 = !draw2;
+		break;
+	case SDLK_z:
+		debugmode = !debugmode;
+		break;
+	case SDLK_e:
+		spotlight2.pos = spotlight1.pos;
+		spotlight2.look_at = spotlight2.pos - (spotlight1.pos - spotlight1.look_at);
+		break;
+	case SDLK_r:
+		spotlight2.look_at = spotlight1.look_at;
+		break;
 	case SDLK_UP:
-	    spotlight.move(glm::vec3(0,0,-1));
+	    spotlight1.move(glm::vec3(0, 0, -1));
 	    break;
 	case SDLK_DOWN:
-	    spotlight.move(glm::vec3(0,0,1));
+	    spotlight1.move(glm::vec3(0, 0, 1));
 	    break;
 	case SDLK_LEFT:
-	    spotlight.move(glm::vec3(-1,0,0));
+	    spotlight1.move(glm::vec3(-1, 0, 0));
 	    break;
 	case SDLK_RIGHT:
-	    spotlight.move(glm::vec3(1,0,0));
+	    spotlight1.move(glm::vec3(1, 0, 0));
 	    break;
 	case SDLK_KP_PLUS:
-	    spotlight.move(glm::vec3(0,1,0));
+	    spotlight1.move(glm::vec3(0, 1, 0));
 	    break;
 	case SDLK_KP_MINUS:
-	    spotlight.move(glm::vec3(0,-1,0));
+	    spotlight1.move(glm::vec3(0, -1, 0));
 	    break;
+	case SDLK_KP_8:
+		spotlight2.move(glm::vec3(0, 0, -1));
+		break;
+	case SDLK_KP_2:
+		spotlight2.move(glm::vec3(0, 0, 1));
+		break;
+	case SDLK_KP_4:
+		spotlight2.move(glm::vec3(-1, 0, 0));
+		break;
+	case SDLK_KP_6:
+		spotlight2.move(glm::vec3(1, 0, 0));
+		break;
+	case SDLK_KP_7:
+		spotlight2.move(glm::vec3(0, 1, 0));
+		break;
+	case SDLK_KP_1:
+		spotlight2.move(glm::vec3(0, -1, 0));
+		break;
 	// Print camera position for debugging
 	case SDLK_p:
 	    std::cout << "Camera position: " << cam.position.x << ", " << cam.position.y << ", " << cam.position.z << std::endl;
 	    break;
-	// Print spotlight position for debugging
+	// Print spotlight positions for debugging
 	case SDLK_l:
-	    std::cout << "Spotlight position: " << spotlight.pos.x << ", " << spotlight.pos.y << ", " << spotlight.pos.z << std::endl;
+	    std::cout << "Spotlight1 position: " << spotlight1.pos.x << ", " << spotlight1.pos.y << ", " << spotlight1.pos.z << std::endl;
 	    break;
+	case SDLK_k:
+		std::cout << "Spotlight2 position: " << spotlight2.pos.x << ", " << spotlight2.pos.y << ", " << spotlight2.pos.z << std::endl;
+		break;
 	// Öka bias
 	case SDLK_b:
 	    bias += 0.0001;

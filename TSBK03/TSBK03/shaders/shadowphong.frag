@@ -11,6 +11,8 @@ uniform sampler2DShadow texUnit;
 uniform float bias;
 uniform vec2 pixelDiff;
 
+uniform vec3 lPos;	// Ljuspositionen.
+
 vec3 r;
 vec3 s;			// Infallande ljus.
 vec3 eye;			// Vektor från objektet till kameran.
@@ -32,12 +34,12 @@ void main(void)
 {
 	// --- Phong stuff ---
 	// --- FIXA ---
-	isDirectional = 1;
+	isDirectional = 0;
 	lightSourceColor = vec3(1.0, 1.0, 1.0);
 	specularExponent = 280.0;
 	// ------------
 	// Infallande och reflekterat ljus beräknas för alla ljuskällor.
-	s = normalize(vec3(lightSourceCoord.x, lightSourceCoord.y, lightSourceCoord.z) - (1 - isDirectional) * outObjPos);
+	s = normalize(vec3(lPos.x, lPos.y, lPos.z) - (1 - isDirectional) * outObjPos);
 	r = normalize(2 * outNormal * dot(normalize(s), normalize(outNormal)) - s);
 
 	// eye-vektorn beräknas.
@@ -77,6 +79,6 @@ void main(void)
 	depth /= filter_side*filter_side;
 		
 	//out_color = vec4(vec3(depth), 1);
-	totalLight = totalLight * depth;
+	totalLight = totalLight * depth*0.3;
 	out_color = vec4(totalLight, 1);
 }

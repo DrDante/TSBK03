@@ -94,10 +94,10 @@
     <None Include="shaders\plaintextureshader.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\shadow_1.frag">
+    <None Include="shaders\shadowphong.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="shaders\shadow_1.vert">
+    <None Include="shaders\shadowphong.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
