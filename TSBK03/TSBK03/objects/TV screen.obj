@@ -1,0 +1,15 @@
+# Blender v2.72 (sub 0) OBJ File: 'projekt_rum.blend'
+# www.blender.org
+mtllib TV skärm.mtl
+o _5inch_LCD_Screen
+v -0.136549 1.150346 -1.808622
+v 0.715883 1.150346 -1.808622
+v 0.715883 0.679876 -1.808622
+v -0.136549 0.679876 -1.808622
+vt 0.000000 1.000000
+vt 1.000000 1.000000
+vt 1.000000 0.000000
+vt 0.000000 0.000000
+usemtl TV_romantic
+s off
+f 1/1 2/2 3/3 4/4

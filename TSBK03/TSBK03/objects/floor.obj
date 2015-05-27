@@ -1,0 +1,15 @@
+# Blender v2.72 (sub 0) OBJ File: 'projekt_rum.blend'
+# www.blender.org
+mtllib golv(forward min Z - up Y ).mtl
+o Plane
+v -1.991466 -0.001927 2.018988
+v 3.825927 -0.001927 2.018988
+v -1.991466 -0.001927 -2.026424
+v 3.825927 -0.001927 -2.026424
+vt -0.998502 -0.694333
+vt 1.998502 -0.694333
+vt 1.998502 1.389783
+vt -0.998502 1.389783
+usemtl Material.056
+s off
+f 1/1 2/2 4/3 3/4
