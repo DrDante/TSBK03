@@ -70,7 +70,7 @@ void main(void)
 	float depth = 0;
 
 	// filter_sidexfilter_side filtrering för snyggare skuggor
-	int filter_side = 5;
+	int filter_side = 25;
 	for(int y = -(filter_side-1)/2; y <= (filter_side-1)/2;y++){
 		for(int x = -(filter_side-1)/2; x <= (filter_side-1)/2;x++){
 			depth += texture(texUnit, vec3(shadowCoord.x+x*pixelDiff.x, shadowCoord.y+y*pixelDiff.y, shadowCoord.z));

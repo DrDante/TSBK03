@@ -129,9 +129,9 @@ class lightSource
 	glm::mat4 projectionMatrix;
 };
 
-lightSource spotlight1(glm::vec3(17, 0, 3), false, glm::vec3(1, 1, 1));
+lightSource spotlight1(glm::vec3(5, 3, -7), true, glm::vec3(1, 1, 1));
 bool draw1 = 1;
-lightSource spotlight2(glm::vec3(15, -2, 13), false, glm::vec3(1, 1, 1));
+lightSource spotlight2(glm::vec3(6, 3, -7), true, glm::vec3(12, 0, 6));
 bool draw2 = 1;
 bool debugmode = 0;
 
@@ -163,7 +163,7 @@ void init(void)
     dumpInfo();  // Shader info.
 
     // GL inits.
-    glClearColor(0.1, 0.1, 0.3, 0);
+    glClearColor(0.0, 0.0, 0.0, 0);
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -223,7 +223,7 @@ void init(void)
 
 
 	blend.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(10, 10, 10));
-	blend.MTWmatrix = glm::translate(glm::vec3(0, -5, 0)) * blend.MTWmatrix;
+	blend.MTWmatrix = glm::translate(glm::vec3(0, -10, 0)) * blend.MTWmatrix;
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
@@ -353,7 +353,7 @@ void draw_scene(lightSource light)
 	torus.draw(zshader);
 
 	// Rita golv
-	//ground.draw(zshader, wallModel);
+	ground.draw(zshader, wallModel);
 
 	// Rita bakre vägg
 	//backwall.draw(zshader, wallModel);
@@ -390,7 +390,7 @@ void draw_scene(lightSource light)
 	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
 	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
-
+	
 	// Rita kanin
 	bunny.draw_with_depthinfo(shadowphongshader, textureMatrix);
 
@@ -401,14 +401,14 @@ void draw_scene(lightSource light)
 	sphere.draw_with_depthinfo(shadowphongshader, textureMatrix);
 
 	// Rita golv
-	//ground.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
+	ground.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
 
 	// Rita bakre vägg
 	//backwall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
 
 	// Rita sidovägg
 	//sidewall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
-
+	glDisable(GL_CULL_FACE);
 	//
 	blend.draw_with_depthinfo(shadowphongshader, textureMatrix);
 
