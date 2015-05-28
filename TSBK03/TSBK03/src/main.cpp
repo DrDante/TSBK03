@@ -211,6 +211,7 @@ void init(void)
 	glm::vec3 sceneSize = glm::vec3(10, 10, 10);
 	glm::vec3 sceneTrans = glm::vec3(0, -10, 0);
 	glm::vec3 bambooTrans = glm::vec3(-16.2246, 0, -17.2567); 
+	glm::vec3 doorTrans = glm::vec3(28.0168, 0, 20.2156);
 
 	m_bed = Thing("objects/bed.obj");
 	m_bedside_table = Thing("objects/bedside_table.obj");
@@ -328,12 +329,16 @@ void init(void)
 	m_lamp.MTWmatrix = glm::translate(sceneTrans) * m_lamp.MTWmatrix;
 	m_door.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door.MTWmatrix = glm::translate(sceneTrans) * m_door.MTWmatrix;
+	m_door.MTWmatrix = glm::translate(doorTrans) * m_door.MTWmatrix;
+
 	m_door_frame.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door_frame.MTWmatrix = glm::translate(sceneTrans) * m_door_frame.MTWmatrix;
 	m_door_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door_handle.MTWmatrix = glm::translate(sceneTrans) * m_door_handle.MTWmatrix;
+	m_door_handle.MTWmatrix = glm::translate(doorTrans) * m_door_handle.MTWmatrix;
 	m_door_keyhole.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door_keyhole.MTWmatrix = glm::translate(sceneTrans) * m_door_keyhole.MTWmatrix;
+	m_door_keyhole.MTWmatrix = glm::translate(doorTrans) * m_door_keyhole.MTWmatrix;
 	m_floor.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_floor.MTWmatrix = glm::translate(sceneTrans) * m_floor.MTWmatrix;
 	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
