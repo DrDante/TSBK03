@@ -74,7 +74,8 @@ Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo
-Thing m_bamboo_leaf, m_flower_pot, m_earth;																	
+Thing m_bamboo_leaf, m_flower_pot, m_earth;											
+float scl = 6;
 std::vector<Thing> objlist;
 
 // Model
@@ -113,8 +114,8 @@ int width = 1024;
 int height = 768; 
 // Övrigt.
 
-// Bias som används för att undvika skuggacne, används i shadow_1.frag
-float bias = 0.0015;
+// Bias som används för att undvika skuggacne, används i shadowphong.frag
+float bias = 0.0001;
 
 //GLfloat t = 0;	// Tidsvariabel.
 
@@ -137,11 +138,16 @@ class lightSource
 
 	glm::mat4 projectionMatrix;
 };
-
-lightSource spotlight1(glm::vec3(38, 11, -20), true, glm::vec3(1, 1, 1));
+ 
+lightSource sunlight(glm::vec3(-28.6608 * scl, 14.3395 * scl, 13.0906 * scl), true, glm::vec3(-5.28038 * scl, -6.90153 * scl, -15.4778 * scl));
 bool draw1 = 1;
-lightSource spotlight2(glm::vec3(-21, 11, -20), true, glm::vec3(12, 0, 6));
+lightSource bedlight1(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, -7.15032 * scl, 18.4093 * scl));
+lightSource bedlight2(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, 7.15032 * scl, 18.4093 * scl));
 bool draw2 = 1;
+lightSource desklamp(glm::vec3(21.5796 * scl, 1.4167 * scl, -17.2829 * scl), true, glm::vec3(22.8042 * scl, -2.43597 * scl, -17.2353 * scl));
+bool draw3 = 1;
+lightSource cornerlight(glm::vec3(34.3285 * scl, 13.3838 * scl, 17.0802 * scl), true, glm::vec3(-11.2398 * scl, -3.28959 * scl, -12.6265 * scl));
+bool draw4 = 1;
 bool debugmode = 0;
 
 // --------------------Function declarations--------------------
@@ -208,10 +214,12 @@ void init(void)
 
 	lightsrc = Thing("objects/sphere.obj");
 	// --- Julius modeller ---
-	glm::vec3 sceneSize = glm::vec3(10, 10, 10);
-	glm::vec3 sceneTrans = glm::vec3(0, -10, 0);
-	glm::vec3 bambooTrans = glm::vec3(-16.2246, 0, -17.2567); 
-	glm::vec3 doorTrans = glm::vec3(28.0168, 0, 20.2156);
+	glm::vec3 sceneSize = glm::vec3(10 * scl, 10 * scl, 10 * scl);
+	glm::vec3 sceneTrans = glm::vec3(0 * scl, -10 * scl, 0 * scl);
+	glm::vec3 bambooTrans = glm::vec3(-16.2246*scl, 0 * scl, -17.2567*scl);
+	glm::vec3 doorTrans = glm::vec3(28.0168*scl, 0 * scl, 20.2156*scl);
+
+	lightsrc.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 
 	m_bed = Thing("objects/bed.obj");
 	m_bedside_table = Thing("objects/bedside_table.obj");
@@ -413,8 +421,11 @@ void init(void)
 
     // Sätt ljuskällornas projektionsmatrix
 	glm::mat4 lightpersp = glm::perspective(float(PI / 2), float(width) / height, 1.0f, 1000.0f);
-    spotlight1.projectionMatrix = lightpersp;
-	spotlight2.projectionMatrix = lightpersp;
+    sunlight.projectionMatrix = lightpersp;
+	bedlight1.projectionMatrix = lightpersp;
+	bedlight2.projectionMatrix = lightpersp;
+	desklamp.projectionMatrix = lightpersp;
+	cornerlight.projectionMatrix = lightpersp;
 	//spotlight.projectionMatrix = glm::ortho(0.0f, float(width), 0.0f, float(height), 1.0f, 1000.0f);
 
 }
@@ -448,11 +459,20 @@ void display(void)
 	// Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo
 	if (draw1)
 	{
-		draw_scene(spotlight1);
+		draw_scene(sunlight);
 	}
 	if (draw2)
 	{
-		draw_scene(spotlight2);
+		draw_scene(bedlight1);
+		draw_scene(bedlight2);
+	}
+	if (draw3)
+	{
+		draw_scene(desklamp);
+	}
+	if (draw4)
+	{
+		draw_scene(cornerlight);
 	}
 
 	// Rita ut ljuskällor till res_fbo
@@ -460,11 +480,20 @@ void display(void)
 	{
 		if (draw1)
 		{
-			draw_lights(spotlight1);
+			draw_lights(sunlight);
 		}
 		if (draw2)
 		{
-			draw_lights(spotlight2);
+			draw_lights(bedlight1);
+			draw_lights(bedlight2);
+		}
+		if (draw3)
+		{
+			draw_lights(desklamp);
+		}
+		if (draw4)
+		{
+			draw_lights(cornerlight);
 		}
 	}
 
@@ -502,8 +531,8 @@ void draw_scene(lightSource light)
 
 	// Aktivera z-buffering
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	// Flytta kamera till ljuskällan
 	glm::vec3 tmp_cam_pos = cam.position;
@@ -543,7 +572,7 @@ void draw_scene(lightSource light)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// ---------------- Scenen renderas till tmp_fbo ----------------
-
+	
 	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
 	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
@@ -681,62 +710,58 @@ void handle_keypress(SDL_Event event)
 	case SDLK_2:
 		draw2 = !draw2;
 		break;
+	case SDLK_3:
+		draw3 = !draw3;
+		break;
 	case SDLK_z:
 		debugmode = !debugmode;
 		break;
-	case SDLK_e:
-		spotlight2.pos = spotlight1.pos;
-		spotlight2.look_at = spotlight2.pos - (spotlight1.pos - spotlight1.look_at);
-		break;
-	case SDLK_r:
-		spotlight2.look_at = spotlight1.look_at;
-		break;
 	case SDLK_UP:
-	    spotlight1.move(glm::vec3(0, 0, -1));
+	    sunlight.move(glm::vec3(0, 0, -1));
 	    break;
 	case SDLK_DOWN:
-	    spotlight1.move(glm::vec3(0, 0, 1));
+	    sunlight.move(glm::vec3(0, 0, 1));
 	    break;
 	case SDLK_LEFT:
-	    spotlight1.move(glm::vec3(-1, 0, 0));
+		sunlight.move(glm::vec3(-1, 0, 0));
 	    break;
 	case SDLK_RIGHT:
-	    spotlight1.move(glm::vec3(1, 0, 0));
+		sunlight.move(glm::vec3(1, 0, 0));
 	    break;
 	case SDLK_KP_PLUS:
-	    spotlight1.move(glm::vec3(0, 1, 0));
+		sunlight.move(glm::vec3(0, 1, 0));
 	    break;
 	case SDLK_KP_MINUS:
-	    spotlight1.move(glm::vec3(0, -1, 0));
+		sunlight.move(glm::vec3(0, -1, 0));
 	    break;
 	case SDLK_KP_8:
-		spotlight2.move(glm::vec3(0, 0, -1));
+		cornerlight.move(glm::vec3(0, 0, -0.1));
 		break;
 	case SDLK_KP_2:
-		spotlight2.move(glm::vec3(0, 0, 1));
+		cornerlight.move(glm::vec3(0, 0, 0.1));
 		break;
 	case SDLK_KP_4:
-		spotlight2.move(glm::vec3(-1, 0, 0));
+		cornerlight.move(glm::vec3(-0.1, 0, 0));
 		break;
 	case SDLK_KP_6:
-		spotlight2.move(glm::vec3(1, 0, 0));
+		cornerlight.move(glm::vec3(0.1, 0, 0));
 		break;
 	case SDLK_KP_7:
-		spotlight2.move(glm::vec3(0, 1, 0));
+		cornerlight.move(glm::vec3(0, 0.1, 0));
 		break;
 	case SDLK_KP_1:
-		spotlight2.move(glm::vec3(0, -1, 0));
+		cornerlight.move(glm::vec3(0, -0.1, 0));
 		break;
 	// Print camera position for debugging
 	case SDLK_p:
-	    std::cout << "Camera position: " << cam.position.x << ", " << cam.position.y << ", " << cam.position.z << std::endl;
+		std::cout << "Camera position: " << cam.position.x / scl << ", " << cam.position.y / scl << ", " << cam.position.z / scl << std::endl;
 	    break;
 	// Print spotlight positions for debugging
 	case SDLK_l:
-	    std::cout << "Spotlight1 position: " << spotlight1.pos.x << ", " << spotlight1.pos.y << ", " << spotlight1.pos.z << std::endl;
+		std::cout << "sunlight position: " << sunlight.pos.x / scl << ", " << sunlight.pos.y / scl << ", " << sunlight.pos.z / scl << std::endl;
 	    break;
 	case SDLK_k:
-		std::cout << "Spotlight2 position: " << spotlight2.pos.x << ", " << spotlight2.pos.y << ", " << spotlight2.pos.z << std::endl;
+		std::cout << "bedlight1 position: " << bedlight1.pos.x / scl << ", " << bedlight1.pos.y / scl << ", " << bedlight1.pos.z / scl << std::endl;
 		break;
 	// Öka bias
 	case SDLK_b:
@@ -763,14 +788,14 @@ void check_keys()
 {
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
     if(keystate[SDL_SCANCODE_W]) {
-	cam.forward(0.1*SPEED);
+		cam.forward(0.1*scl*SPEED);
     } else if(keystate[SDL_SCANCODE_S]) {
-	cam.forward(-0.1*SPEED);
+		cam.forward(-0.1*scl*SPEED);
     }
     if(keystate[SDL_SCANCODE_A]) {
-	cam.strafe(0.1*SPEED);
+		cam.strafe(0.1*scl*SPEED);
     } else if(keystate[SDL_SCANCODE_D]) {
-	cam.strafe(-0.1*SPEED);
+		cam.strafe(-0.1*scl*SPEED);
     }
 }
 

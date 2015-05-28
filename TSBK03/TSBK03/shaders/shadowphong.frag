@@ -29,6 +29,10 @@ vec3 diffLight;		// Diffuse.
 vec3 specLight;		// Specular.
 vec3 totalLight;	// Totalt ljus.
 
+float distance;
+float cutoff;
+float rangeComp;
+
 
 void main(void)
 {
@@ -70,15 +74,20 @@ void main(void)
 	float depth = 0;
 
 	// filter_sidexfilter_side filtrering för snyggare skuggor
-	int filter_side = 25;
+	int filter_side = 9;
 	for(int y = -(filter_side-1)/2; y <= (filter_side-1)/2;y++){
 		for(int x = -(filter_side-1)/2; x <= (filter_side-1)/2;x++){
 			depth += texture(texUnit, vec3(shadowCoord.x+x*pixelDiff.x, shadowCoord.y+y*pixelDiff.y, shadowCoord.z));
 		}
 	}
 	depth /= filter_side*filter_side;
-		
+	
+	distance = length(outObjPos - lPos);
+	//cutoff = 50;
+	//rangeComp = max((cutoff - distance)/cutoff, 0.05);
+	rangeComp = 10000/(10000+distance*distance);
+
 	//out_color = vec4(vec3(depth), 1);
-	totalLight = totalLight * depth*0.3;
+	totalLight = totalLight * depth* rangeComp;
 	out_color = vec4(totalLight, 1);
 }
