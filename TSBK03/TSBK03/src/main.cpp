@@ -63,14 +63,18 @@ GLenum err;
 // ---------------------------Globals---------------------------
 // Saker
 Thing lightsrc;																		// Ljuskälla (debug endast)
-Thing m_bed, m_bedside_table, m_mattress, m_sheet_pillow;							// Bed, etc.
+Thing m_bed, m_mattress, m_sheet_pillow;											// Bed, etc.
+Thing m_bedside_lamp, m_bedside_lamp_shade, m_light_bulb;							// Sänglampa
+Thing m_bedside_table, m_bedside_table_handle, m_bedside_table_doors;				// Bedside table, etc
 Thing m_books, m_bookshelf;															// Bookshelf, etc.
 Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
 Thing m_desk, m_desk_cap, m_desk_handle, m_lamp;									// Desk, etc.
 Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
-Thing m_floor, m_walls;																// Golv, väggar.
+Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
+Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo
+Thing m_bamboo_leaf, m_flower_pot, m_earth;																	
 std::vector<Thing> objlist;
 
 // Model
@@ -206,12 +210,28 @@ void init(void)
 	// --- Julius modeller ---
 	glm::vec3 sceneSize = glm::vec3(10, 10, 10);
 	glm::vec3 sceneTrans = glm::vec3(0, -10, 0);
+	glm::vec3 bambooTrans = glm::vec3(-16.2246, 0, -17.2567); 
+
 	m_bed = Thing("objects/bed.obj");
 	m_bedside_table = Thing("objects/bedside_table.obj");
+	m_bedside_table_handle = Thing("objects/bedside_table_handle.obj");
+	m_bedside_table_doors = Thing("objects/bedside_table_doors.obj");
+	m_bedside_lamp = Thing("objects/bedside_lamp.obj");
+	m_bedside_lamp_shade = Thing("objects/bedside_lamp_shade.obj");
+	m_light_bulb = Thing("objects/light_bulb.obj");
 	m_mattress = Thing("objects/mattress.obj");
 	m_sheet_pillow = Thing("objects/sheet_pillow.obj");
 	m_books = Thing("objects/books.obj");
 	m_bookshelf = Thing("objects/bookshelf.obj");
+	m_bamboo1 = Thing("objects/bamboo1.obj");
+	m_bamboo2 = Thing("objects/bamboo2.obj");
+	m_bamboo3 = Thing("objects/bamboo3.obj");
+	m_bamboo4 = Thing("objects/bamboo4.obj");
+	m_bamboo5 = Thing("objects/bamboo5.obj");
+	m_bamboo6 = Thing("objects/bamboo6.obj");
+	m_bamboo_leaf = Thing("objects/bamboo_leaf.obj");
+	m_flower_pot = Thing("objects/flower_pot.obj");
+	m_earth = Thing("objects/earth.obj");
 	/*m_chair_back = Thing("objects/chair_back.obj");
 	m_chair_legs = Thing("objects/chair_legs.obj");
 	m_chair_lower_part = Thing("objects/chair_lower_part.obj");
@@ -227,6 +247,7 @@ void init(void)
 	m_door_keyhole = Thing("objects/door_keyhole.obj");
 	m_floor = Thing("objects/floor.obj");
 	m_walls = Thing("objects/walls.obj");
+	m_ceiling = Thing("objects/ceiling.obj");
 	m_TV = Thing("objects/TV.obj");
 	m_TV_granite = Thing("objects/TV_granite.obj");
 	m_TV_screen = Thing("objects/TV_screen.obj");
@@ -240,6 +261,45 @@ void init(void)
 	m_bed.MTWmatrix = glm::translate(sceneTrans) * m_bed.MTWmatrix;
 	m_bedside_table.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bedside_table.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table.MTWmatrix;
+	m_bedside_table_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table_handle.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table_handle.MTWmatrix;
+	m_bedside_table_doors.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table_doors.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table_doors.MTWmatrix;
+	m_bedside_lamp.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp.MTWmatrix;
+	m_bedside_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_shade.MTWmatrix;
+	m_light_bulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_light_bulb.MTWmatrix = glm::translate(sceneTrans) * m_light_bulb.MTWmatrix;
+
+	m_bamboo1.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo1.MTWmatrix = glm::translate(sceneTrans) * m_bamboo1.MTWmatrix;
+	m_bamboo1.MTWmatrix = glm::translate(bambooTrans) * m_bamboo1.MTWmatrix;
+	m_bamboo2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo2.MTWmatrix = glm::translate(sceneTrans) * m_bamboo2.MTWmatrix;
+	m_bamboo2.MTWmatrix = glm::translate(bambooTrans) * m_bamboo2.MTWmatrix;
+	m_bamboo3.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo3.MTWmatrix = glm::translate(sceneTrans) * m_bamboo3.MTWmatrix;
+	m_bamboo3.MTWmatrix = glm::translate(bambooTrans) * m_bamboo3.MTWmatrix;
+	m_bamboo4.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo4.MTWmatrix = glm::translate(sceneTrans) * m_bamboo4.MTWmatrix;
+	m_bamboo4.MTWmatrix = glm::translate(bambooTrans) * m_bamboo4.MTWmatrix;
+	m_bamboo5.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo5.MTWmatrix = glm::translate(sceneTrans) * m_bamboo5.MTWmatrix;
+	m_bamboo5.MTWmatrix = glm::translate(bambooTrans) * m_bamboo5.MTWmatrix;
+	m_bamboo6.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo6.MTWmatrix = glm::translate(sceneTrans) * m_bamboo6.MTWmatrix;
+	m_bamboo6.MTWmatrix = glm::translate(bambooTrans) * m_bamboo6.MTWmatrix;
+	m_bamboo_leaf.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bamboo_leaf.MTWmatrix = glm::translate(sceneTrans) * m_bamboo_leaf.MTWmatrix;
+	m_bamboo_leaf.MTWmatrix = glm::translate(bambooTrans) * m_bamboo_leaf.MTWmatrix;
+	m_flower_pot.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_flower_pot.MTWmatrix = glm::translate(sceneTrans) * m_flower_pot.MTWmatrix;
+	m_flower_pot.MTWmatrix = glm::translate(bambooTrans) * m_flower_pot.MTWmatrix;
+	m_earth.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_earth.MTWmatrix = glm::translate(sceneTrans) * m_earth.MTWmatrix;
+	m_earth.MTWmatrix = glm::translate(bambooTrans) * m_earth.MTWmatrix;
+
 	m_mattress.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_mattress.MTWmatrix = glm::translate(sceneTrans) * m_mattress.MTWmatrix;
 	m_sheet_pillow.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -278,6 +338,8 @@ void init(void)
 	m_floor.MTWmatrix = glm::translate(sceneTrans) * m_floor.MTWmatrix;
 	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_walls.MTWmatrix = glm::translate(sceneTrans) * m_walls.MTWmatrix;
+	m_ceiling.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling.MTWmatrix = glm::translate(sceneTrans) * m_ceiling.MTWmatrix;
 	m_TV.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_TV.MTWmatrix = glm::translate(sceneTrans) * m_TV.MTWmatrix;
 	m_TV_granite.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -294,6 +356,20 @@ void init(void)
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
 	objlist.push_back(m_bed);
 	objlist.push_back(m_bedside_table);
+	objlist.push_back(m_bedside_table_handle);
+	objlist.push_back(m_bedside_table_doors);
+	objlist.push_back(m_bedside_lamp);
+	objlist.push_back(m_bedside_lamp_shade);
+	objlist.push_back(m_light_bulb);
+	objlist.push_back(m_bamboo1);
+	objlist.push_back(m_bamboo2);
+	objlist.push_back(m_bamboo3);
+	objlist.push_back(m_bamboo4);
+	objlist.push_back(m_bamboo5);
+	objlist.push_back(m_bamboo6);
+	objlist.push_back(m_bamboo_leaf);
+	objlist.push_back(m_flower_pot);
+	objlist.push_back(m_earth);
 	objlist.push_back(m_mattress);
 	objlist.push_back(m_sheet_pillow);
 	objlist.push_back(m_books);
@@ -313,6 +389,7 @@ void init(void)
 	objlist.push_back(m_lamp);
 	objlist.push_back(m_floor);
 	objlist.push_back(m_walls);
+	objlist.push_back(m_ceiling);
 	objlist.push_back(m_TV);
 	objlist.push_back(m_TV_granite);
 	objlist.push_back(m_TV_screen);
