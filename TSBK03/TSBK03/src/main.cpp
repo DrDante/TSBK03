@@ -12,6 +12,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
+#include <vector>
 
 #ifdef _WIN32
 // MS
@@ -61,7 +62,16 @@ GLenum err;
 
 // ---------------------------Globals---------------------------
 // Saker
-Thing bunny, ground, sidewall, backwall, sphere, torus, lightsrc, blend;
+Thing lightsrc;																		// Ljuskälla (debug endast)
+Thing m_bed, m_bedside_table, m_mattress, m_sheet_pillow;							// Bed, etc.
+Thing m_books, m_bookshelf;															// Bookshelf, etc.
+Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
+Thing m_desk, m_desk_cap, m_desk_handle, m_lamp;									// Desk, etc.
+Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
+Thing m_floor, m_walls;																// Golv, väggar.
+Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
+Thing m_window_handle, m_windows;													// Windows.
+std::vector<Thing> objlist;
 
 // Model
 Model *wallModel;
@@ -88,11 +98,6 @@ Camera cam;
 glm::mat4 projectionMatrix;
 glm::mat4 viewMatrix;
 glm::mat4 scaleBiasMatrix;
-glm::mat4 bunnyTrans;
-glm::mat4 squareTrans;
-glm::mat4 groundTrans;
-glm::mat4 wallTrans;
-glm::mat4 blendTrans;
 
 // FBO
 FBOstruct *z_fbo, *tmp_fbo, *res_fbo;
@@ -129,9 +134,9 @@ class lightSource
 	glm::mat4 projectionMatrix;
 };
 
-lightSource spotlight1(glm::vec3(5, 3, -7), true, glm::vec3(1, 1, 1));
+lightSource spotlight1(glm::vec3(38, 11, -20), true, glm::vec3(1, 1, 1));
 bool draw1 = 1;
-lightSource spotlight2(glm::vec3(6, 3, -7), true, glm::vec3(12, 0, 6));
+lightSource spotlight2(glm::vec3(-21, 11, -20), true, glm::vec3(12, 0, 6));
 bool draw2 = 1;
 bool debugmode = 0;
 
@@ -141,6 +146,9 @@ void reshape(int w, int h, glm::mat4 &projectionMatrix);
 void idle();
 void fbo_add_tmp_to_res();
 void draw_scene(lightSource light);
+void draw_order(lightSource light);
+void draw_order(lightSource light, glm::mat4 textureMatrix);
+
 void draw_lights(lightSource light);
 
 // SDL functions
@@ -181,49 +189,136 @@ void init(void)
     // Ändra width och height för bättre upplösning på skuggor!
     z_fbo = init_z_fbo(SHADOW_W, SHADOW_H);
 
-    // Ladda upp hur står ändring i texturen en pixel är
+    // Ladda upp hur stor ändring i texturen en pixel är
     glUseProgram(shadowphongshader);
     glm::vec2 pixelDiff = glm::vec2(1.0/SHADOW_W, 1.0/SHADOW_H);
     glUniform2f(glGetUniformLocation(shadowphongshader, "pixelDiff"), pixelDiff.x, pixelDiff.y);
     
-
     printError("init shader");
 
     // Laddning av modeller.
-    wallModel = LoadModelPlus((char*)"objects/ground.obj");
-    bunny = Thing("objects/bunnyplus.obj");
-    sphere = Thing("objects/sphere.obj");
-    torus = Thing("objects/torus.obj");
 
 	squareModel = LoadDataToModel(
 		square, NULL, squareTexCoord, NULL,
 		squareIndices, 4, 6);
 
 	lightsrc = Thing("objects/sphere.obj");
-
-	blend = Thing("objects/blend.obj");
+	// --- Julius modeller ---
+	glm::vec3 sceneSize = glm::vec3(10, 10, 10);
+	glm::vec3 sceneTrans = glm::vec3(0, -10, 0);
+	m_bed = Thing("objects/bed.obj");
+	m_bedside_table = Thing("objects/bedside_table.obj");
+	m_mattress = Thing("objects/mattress.obj");
+	m_sheet_pillow = Thing("objects/sheet_pillow.obj");
+	m_books = Thing("objects/books.obj");
+	m_bookshelf = Thing("objects/bookshelf.obj");
+	/*m_chair_back = Thing("objects/chair_back.obj");
+	m_chair_legs = Thing("objects/chair_legs.obj");
+	m_chair_lower_part = Thing("objects/chair_lower_part.obj");
+	m_chair_seat = Thing("objects/chair_seat.obj");
+	m_chair_wheels = Thing("objects/chair_wheels.obj");*/
+	m_desk = Thing("objects/desk.obj");
+	m_desk_cap = Thing("objects/desk_cap.obj");
+	m_desk_handle = Thing("objects/desk_handle.obj");
+	m_lamp = Thing("objects/lamp.obj");
+	m_door = Thing("objects/door.obj");
+	m_door_frame = Thing("objects/door_frame.obj");
+	m_door_handle = Thing("objects/door_handle.obj");
+	m_door_keyhole = Thing("objects/door_keyhole.obj");
+	m_floor = Thing("objects/floor.obj");
+	m_walls = Thing("objects/walls.obj");
+	m_TV = Thing("objects/TV.obj");
+	m_TV_granite = Thing("objects/TV_granite.obj");
+	m_TV_screen = Thing("objects/TV_screen.obj");
+	m_TV_table = Thing("objects/TV_table.obj");
+	m_window_handle = Thing("objects/window_handle.obj");
+	m_windows = Thing("objects/windows.obj");
+	// -----------------------
 
     // Initiell placering och skalning av modeller.
-    bunny.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(3,3,3));
+	m_bed.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bed.MTWmatrix = glm::translate(sceneTrans) * m_bed.MTWmatrix;
+	m_bedside_table.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table.MTWmatrix;
+	m_mattress.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_mattress.MTWmatrix = glm::translate(sceneTrans) * m_mattress.MTWmatrix;
+	m_sheet_pillow.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_sheet_pillow.MTWmatrix = glm::translate(sceneTrans) * m_sheet_pillow.MTWmatrix;
+	m_books.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_books.MTWmatrix = glm::translate(sceneTrans) * m_books.MTWmatrix;
+	m_bookshelf.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bookshelf.MTWmatrix = glm::translate(sceneTrans) * m_bookshelf.MTWmatrix;
+	/*m_chair_back.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_back.MTWmatrix = glm::translate(sceneTrans) * m_chair_back.MTWmatrix;
+	m_chair_legs.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_legs.MTWmatrix = glm::translate(sceneTrans) * m_chair_legs.MTWmatrix;
+	m_chair_lower_part.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_lower_part.MTWmatrix = glm::translate(sceneTrans) * m_chair_lower_part.MTWmatrix;
+	m_chair_seat.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_seat.MTWmatrix = glm::translate(sceneTrans) * m_chair_seat.MTWmatrix;
+	m_chair_wheels.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_wheels.MTWmatrix = glm::translate(sceneTrans) * m_chair_wheels.MTWmatrix;*/
+	m_desk.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk.MTWmatrix = glm::translate(sceneTrans) * m_desk.MTWmatrix;
+	m_desk_cap.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_cap.MTWmatrix = glm::translate(sceneTrans) * m_desk_cap.MTWmatrix;
+	m_desk_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_handle.MTWmatrix = glm::translate(sceneTrans) * m_desk_handle.MTWmatrix;
+	m_lamp.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_lamp.MTWmatrix = glm::translate(sceneTrans) * m_lamp.MTWmatrix;
+	m_door.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_door.MTWmatrix = glm::translate(sceneTrans) * m_door.MTWmatrix;
+	m_door_frame.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_door_frame.MTWmatrix = glm::translate(sceneTrans) * m_door_frame.MTWmatrix;
+	m_door_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_door_handle.MTWmatrix = glm::translate(sceneTrans) * m_door_handle.MTWmatrix;
+	m_door_keyhole.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_door_keyhole.MTWmatrix = glm::translate(sceneTrans) * m_door_keyhole.MTWmatrix;
+	m_floor.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_floor.MTWmatrix = glm::translate(sceneTrans) * m_floor.MTWmatrix;
+	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_walls.MTWmatrix = glm::translate(sceneTrans) * m_walls.MTWmatrix;
+	m_TV.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_TV.MTWmatrix = glm::translate(sceneTrans) * m_TV.MTWmatrix;
+	m_TV_granite.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_TV_granite.MTWmatrix = glm::translate(sceneTrans) * m_TV_granite.MTWmatrix;
+	m_TV_screen.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_TV_screen.MTWmatrix = glm::translate(sceneTrans) * m_TV_screen.MTWmatrix;
+	m_TV_table.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_TV_table.MTWmatrix = glm::translate(sceneTrans) * m_TV_table.MTWmatrix;
+	m_window_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_window_handle.MTWmatrix = glm::translate(sceneTrans) * m_window_handle.MTWmatrix;
+	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
 
-    torus.MTWmatrix = glm::translate(glm::vec3(-5,-2,-4));
-
-    sphere.MTWmatrix = glm::translate(glm::vec3(5,0,-2));
-
-    ground.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    ground.MTWmatrix= glm::translate(glm::vec3(0,-10,0)) * ground.MTWmatrix;
-
-    backwall.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    backwall.MTWmatrix = glm::rotate(backwall.MTWmatrix, float(PI/2.0), glm::vec3(1,0,0));
-    backwall.MTWmatrix = glm::translate(glm::vec3(0,9.9,-20)) * backwall.MTWmatrix;
-
-    sidewall.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(20,20,20));
-    sidewall.MTWmatrix = glm::rotate(sidewall.MTWmatrix, float(PI/2.0), glm::vec3(0,0,1));
-    sidewall.MTWmatrix = glm::translate(glm::vec3(20,9.9,0)) * sidewall.MTWmatrix;
-
-
-	blend.MTWmatrix = glm::scale(glm::mat4(), glm::vec3(10, 10, 10));
-	blend.MTWmatrix = glm::translate(glm::vec3(0, -10, 0)) * blend.MTWmatrix;
+	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
+	objlist.push_back(m_bed);
+	objlist.push_back(m_bedside_table);
+	objlist.push_back(m_mattress);
+	objlist.push_back(m_sheet_pillow);
+	objlist.push_back(m_books);
+	objlist.push_back(m_bookshelf);
+	/*objlist.push_back(m_chair_back);
+	objlist.push_back(m_chair_legs);
+	objlist.push_back(m_chair_lower_part);
+	objlist.push_back(m_chair_seat);
+	objlist.push_back(m_chair_wheels);*/
+	objlist.push_back(m_desk);
+	objlist.push_back(m_desk_cap);
+	objlist.push_back(m_desk_handle);
+	objlist.push_back(m_door);
+	objlist.push_back(m_door_frame);
+	objlist.push_back(m_door_handle);
+	objlist.push_back(m_door_keyhole);
+	objlist.push_back(m_lamp);
+	objlist.push_back(m_floor);
+	objlist.push_back(m_walls);
+	objlist.push_back(m_TV);
+	objlist.push_back(m_TV_granite);
+	objlist.push_back(m_TV_screen);
+	objlist.push_back(m_TV_table);
+	objlist.push_back(m_window_handle);
+	objlist.push_back(m_windows);
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
@@ -245,11 +340,10 @@ void init(void)
 void display(void)
 {
 	// TODO
-	// 1 Bygg scen (Julius, blender!)
-	// 2 Bygg system för ljuskällegeometri + penumbra
-	// 2 I arbete ovan, orda objektberoende phongparametrar
-	// 3 Med planerade mängd ljuskällor, gör processen som görs per ljuskälla
-	// 4 Animering, någon slags rörelsesystem (inkl kollisionsdetection?), knappar för att stänga av ljuskällor
+	// 1 Bygg scen (texturer)
+	// 2 Animering, någon slags rörelsesystem(inkl kollisionsdetection ? ), knappar för att stänga av ljuskällor
+	// 3 Ordna objektberoende phongparametrar
+	// 4 (Bygg system för ljuskällegeometri + penumbra)
 	// * Lägg på bloom (och kanske motion blur?)
 	// * Putsa
 
@@ -343,26 +437,7 @@ void draw_scene(lightSource light)
 
 	// ----------------Scenen renderas till z-buffern ----------------
 
-	// Rita kanin
-	bunny.draw(zshader);
-
-	// Rita sfär
-	sphere.draw(zshader);
-
-	// Rita torus
-	torus.draw(zshader);
-
-	// Rita golv
-	ground.draw(zshader, wallModel);
-
-	// Rita bakre vägg
-	//backwall.draw(zshader, wallModel);
-
-	// Rita sidovägg
-	//sidewall.draw(zshader, wallModel);
-
-	//
-	blend.draw(zshader);
+	draw_order(light);
 
 	// -------------------------------------------------------------
 
@@ -391,31 +466,28 @@ void draw_scene(lightSource light)
 	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
 	
-	// Rita kanin
-	bunny.draw_with_depthinfo(shadowphongshader, textureMatrix);
-
-	// Rita torus
-	torus.draw_with_depthinfo(shadowphongshader, textureMatrix);
-
-	// Rita sfär
-	sphere.draw_with_depthinfo(shadowphongshader, textureMatrix);
-
-	// Rita golv
-	ground.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
-
-	// Rita bakre vägg
-	//backwall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
-
-	// Rita sidovägg
-	//sidewall.draw_with_depthinfo(shadowphongshader, textureMatrix, wallModel);
-	glDisable(GL_CULL_FACE);
-	//
-	blend.draw_with_depthinfo(shadowphongshader, textureMatrix);
+	draw_order(light, textureMatrix);
 
 	// -------------------------------------------------------------
 
 	// Scenen adderas till res_fbo
 	fbo_add_tmp_to_res();
+}
+
+void draw_order(lightSource light)
+{
+	for (int n = 0; n < objlist.size(); n++)
+	{
+		objlist.at(n).draw(zshader);
+	}
+}
+
+void draw_order(lightSource light, glm::mat4 textureMatrix)
+{
+	for (int n = 0; n < objlist.size(); n++)
+	{
+		objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix);
+	}
 }
 
 void draw_lights(lightSource light)
