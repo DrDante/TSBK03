@@ -81,6 +81,8 @@ Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
+Thing m_ceiling_lamp1, m_ceiling_bulb1;												// Taklampa 1
+Thing m_ceiling_lamp2, m_ceiling_bulb2;												// Taklampa 2
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -286,9 +288,14 @@ void init(void)
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
+	m_ceiling_lamp1 = Thing("objects/ceiling_lamp1.obj"); 
+	m_ceiling_lamp2 = Thing("objects/ceiling_lamp2.obj");
+	m_ceiling_bulb1 = Thing("objects/ceiling_lamp_light_bulbs1.obj");
+	m_ceiling_bulb2 = Thing("objects/ceiling_lamp_light_bulbs2.obj");
 	// -----------------------
 
     // Initiell placering och skalning av modeller.
+
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_lightbulb.MTWmatrix;
 	m_bedside_lamp_lightbulb2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -410,6 +417,14 @@ void init(void)
 	m_window_handle.MTWmatrix = glm::translate(sceneTrans) * m_window_handle.MTWmatrix;
 	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
+	m_ceiling_lamp1.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling_lamp1.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_lamp1.MTWmatrix;
+	m_ceiling_lamp2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling_lamp2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_lamp2.MTWmatrix;
+	m_ceiling_bulb1.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling_bulb1.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_bulb1.MTWmatrix;
+	m_ceiling_bulb2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling_bulb2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_bulb2.MTWmatrix;
 
 
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
@@ -468,6 +483,12 @@ void init(void)
 	objlist.push_back(m_TV_table);
 	objlist.push_back(m_window_handle);
 	objlist.push_back(m_windows);
+
+	objlist.push_back(m_ceiling_lamp1);
+	objlist.push_back(m_ceiling_lamp2);
+	objlist.push_back(m_ceiling_bulb1);
+	objlist.push_back(m_ceiling_bulb2);
+
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
