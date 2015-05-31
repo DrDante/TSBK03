@@ -65,7 +65,7 @@ GLenum err;
 Thing lightsrc;																		// Ljuskälla (debug endast)
 Thing m_bedside_lamp_lightbulb, m_bedside_lamp_lightbulb2;							// Glödlampor.
 Thing m_desk_lamp_lightbulb, m_Hektar_light_bulb, m_ceiling_bulb1, m_ceiling_bulb2;	// Glödlampor.
-int lightbulbs = 5;																	// Antalet glödlampor (samma som ovan)
+int lightbulbs = 6;																	// Antalet glödlampor (samma som ovan)
 Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo, etc.
 Thing m_bamboo_leaf, m_earth, m_flower_pot;											// Bamboo, etc.
 Thing m_bed, m_mattress, m_sheet_pillow;											// Bed, etc.
@@ -164,15 +164,15 @@ lightSource ceillight12(glm::vec3(22.1733 * scl, 14.0158 * scl, 0.248075 * scl),
 lightSource ceillight13(glm::vec3(20.1561 * scl, 14.0178 * scl, -0.999484 * scl), true, glm::vec3(14.1301 * scl, 1.02795 * scl, 8.77931 * scl));
 bool draw6 = true;
 
-lightSource ceillight21(glm::vec3(1.37932 * scl, 14.3716 * scl, 1.05443 * scl), true, glm::vec3(17.2012 * scl, 11.9174 * scl, -1.89138 * scl));
+lightSource ceillight21(glm::vec3(1.40355 * scl, 14.4348 * scl, 1.05177 * scl), true, glm::vec3(7.80346 * scl, 12.7173 * scl, -0.180466 * scl));
 bool draw7 = true;
-lightSource ceillight22(glm::vec3(0.293889 * scl, 14.0794 * scl, -1.56093 * scl), true, glm::vec3(-9.32643 * scl, 3.99595 * scl, -9.85933 * scl));
+lightSource ceillight22(glm::vec3(0.916115 * scl, 13.9485 * scl, -1.07603 * scl), true, glm::vec3(0.819954 * scl, 6.30125 * scl, -8.91277 * scl));
 bool draw8 = true;
-lightSource ceillight23(glm::vec3(-0.943314 * scl, 14.0175 * scl, 0.960444 * scl), true, glm::vec3(8.47099 * scl, 4.89022 * scl, 11.8742 * scl));
+lightSource ceillight23(glm::vec3(-0.925582 * scl, 14.0328 * scl, 0.92627 * scl), true, glm::vec3(2.81801 * scl, 10.0247 * scl, 6.17313 * scl));
 bool draw9 = true;
 
-lightSource cornerlight(glm::vec3(-16.405 * scl, 12.6004 * scl, -17.4967 * scl), true, glm::vec3(3.89842 * scl, -1.50879 * scl, 4.35974 * scl));
-bool draw0 = true;
+lightSource flashlight(glm::vec3(-16.405 * scl, 12.6004 * scl, -17.4967 * scl), true, glm::vec3(3.89842 * scl, -1.50879 * scl, 4.35974 * scl));
+bool drawf = false;
 bool debugmode = false;
 
 bool isDoorRotating = false;
@@ -456,7 +456,7 @@ void init(void)
 	objlist.push_back(m_desk_lamp_lightbulb);
 	objlist.push_back(m_Hektar_light_bulb);
 	objlist.push_back(m_ceiling_bulb1);
-	//objlist.push_back(m_ceiling_bulb2);
+	objlist.push_back(m_ceiling_bulb2);
 
 	objlist.push_back(m_bed);
 	objlist.push_back(m_bedside_table);
@@ -538,7 +538,7 @@ void init(void)
 	ceillight22.projectionMatrix = lightpersp;
 	ceillight23.projectionMatrix = lightpersp;
 
-	cornerlight.projectionMatrix = lightpersp;
+	flashlight.projectionMatrix = lightpersp;
 	//spotlight.projectionMatrix = glm::ortho(0.0f, float(width), 0.0f, float(height), 1.0f, 1000.0f);
 
 }
@@ -611,9 +611,11 @@ void display(void)
 	{
 		draw_scene(ceillight23);
 	}
-	if (draw0)
+	if (drawf)
 	{
-		draw_scene(cornerlight);
+		flashlight.pos = cam.position;
+		flashlight.look_at = cam.look_at_pos;
+		draw_scene(flashlight);
 	}
 
 	// Rita ut ljuskällor till res_fbo
@@ -658,10 +660,6 @@ void display(void)
 		if (draw9)
 		{
 			draw_lights(ceillight23);
-		}
-		if (draw0)
-		{
-			draw_lights(cornerlight);
 		}
 	}
 
@@ -932,8 +930,8 @@ void handle_keypress(SDL_Event event)
 	case SDLK_9:
 		draw9 = !draw9;
 		break;
-	case SDLK_0:
-		draw0 = !draw0;
+	case SDLK_f:
+		drawf = !drawf;
 		break;
 	case SDLK_z:
 		debugmode = !debugmode;
@@ -970,24 +968,6 @@ void handle_keypress(SDL_Event event)
 	case SDLK_KP_MINUS:
 		sunlight.move(glm::vec3(0, -1, 0));
 	    break;
-	case SDLK_KP_8:
-		ceillight22.move(glm::vec3(0, 0, -0.01));
-		break;
-	case SDLK_KP_2:
-		ceillight22.move(glm::vec3(0, 0, 0.01));
-		break;
-	case SDLK_KP_4:
-		ceillight22.move(glm::vec3(-0.01, 0, 0));
-		break;
-	case SDLK_KP_6:
-		ceillight22.move(glm::vec3(0.01, 0, 0));
-		break;
-	case SDLK_KP_7:
-		ceillight22.move(glm::vec3(0, 0.01, 0));
-		break;
-	case SDLK_KP_1:
-		ceillight22.move(glm::vec3(0, -0.01, 0));
-		break;
 	// Print camera position for debugging
 	case SDLK_p:
 		std::cout << "Camera position: " << cam.position.x / scl << ", " << cam.position.y / scl << ", " << cam.position.z / scl << std::endl;
@@ -996,9 +976,6 @@ void handle_keypress(SDL_Event event)
 	case SDLK_l:
 		std::cout << "sunlight position: " << sunlight.pos.x / scl << ", " << sunlight.pos.y / scl << ", " << sunlight.pos.z / scl << std::endl;
 	    break;
-	case SDLK_k:
-		std::cout << "ceillight22 position: " << ceillight22.pos.x / scl << ", " << ceillight22.pos.y / scl << ", " << ceillight22.pos.z / scl << std::endl;
-		break;
 	// Öka bias
 	case SDLK_b:
 	    bias += 0.0001;
