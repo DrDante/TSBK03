@@ -82,6 +82,7 @@ Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
+Thing m_ceiling2, m_walls2, m_floor2;													// Rum 2
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -315,10 +316,18 @@ void init(void)
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
+	m_ceiling2 = Thing("objects/ceiling2.obj");
+	m_walls2 = Thing("objects/walls2.obj");
+	m_floor2 = Thing("objects/floor2.obj");
 	// -----------------------
 
     // Initiell placering och skalning av modeller.
-
+	m_ceiling2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling2.MTWmatrix;
+	m_walls2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_walls2.MTWmatrix = glm::translate(sceneTrans) * m_walls2.MTWmatrix;
+	m_floor2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_floor2.MTWmatrix = glm::translate(sceneTrans) * m_floor2.MTWmatrix;
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_lightbulb.MTWmatrix;
 	m_bedside_lamp_lightbulb2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -457,6 +466,10 @@ void init(void)
 	objlist.push_back(m_Hektar_light_bulb);
 	objlist.push_back(m_ceiling_bulb1);
 	objlist.push_back(m_ceiling_bulb2);
+	objlist.push_back(m_ceiling2);
+	objlist.push_back(m_walls2);
+	objlist.push_back(m_floor2);
+
 
 	objlist.push_back(m_bed);
 	objlist.push_back(m_bedside_table);
