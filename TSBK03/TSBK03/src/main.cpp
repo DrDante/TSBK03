@@ -63,20 +63,24 @@ GLenum err;
 // ---------------------------Globals---------------------------
 // Saker
 Thing lightsrc;																		// Ljuskälla (debug endast)
+Thing m_bedside_lamp_lightbulb, m_bedside_lamp_lightbulb2;							// Glödlampor.
+Thing m_desk_lamp_lightbulb, m_Hektar_light_bulb;									// Glödlampor.
+int lightbulbs = 4;																	// Antalet glödlampor (samma som ovan)
+Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo, etc.
+Thing m_bamboo_leaf, m_earth, m_flower_pot;											// Bamboo, etc.
 Thing m_bed, m_mattress, m_sheet_pillow;											// Bed, etc.
-Thing m_bedside_lamp, m_bedside_lamp_shade, m_light_bulb;							// Sänglampa
-Thing m_bedside_table, m_bedside_table_handle, m_bedside_table_doors;				// Bedside table, etc
+Thing m_bedside_lamp, m_bedside_lamp_shade;											// Bedside table 1 lamp.
+Thing m_bedside_table, m_bedside_table_handle, m_bedside_table_doors;				// Bedside table 1, etc.
+Thing m_bedside_lamp2, m_bedside_lamp_shade2;										// Bedside table 2 lamp.
+Thing m_bedside_table2, m_bedside_table_handle2, m_bedside_table_doors2;			// Bedside table 2, etc.
 Thing m_books, m_bookshelf;															// Bookshelf, etc.
 Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
-Thing m_desk, m_desk_cap, m_desk_handle, m_lamp;									// Desk, etc.
+Thing m_desk, m_desk_cap, m_desk_handle, m_desk_lamp, m_desk_lamp_holder;			// Desk, etc.
 Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
 Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
-Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo
-Thing m_bamboo_leaf, m_flower_pot, m_earth;											
-Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand;										// Hektar Ikea lampa
-Thing m_Hektar_light_bulb, m_Hektar_light_bulb_stand;
+Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -146,10 +150,15 @@ bool draw1 = 1;
 lightSource bedlight1(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, -7.15032 * scl, 18.4093 * scl));
 lightSource bedlight2(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, 7.15032 * scl, 18.4093 * scl));
 bool draw2 = 1;
-lightSource desklamp(glm::vec3(21.5796 * scl, 1.4167 * scl, -17.2829 * scl), true, glm::vec3(22.8042 * scl, -2.43597 * scl, -17.2353 * scl));
+lightSource bedlight21(glm::vec3((-6.39886 + 20.77) * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3((-6.39886 + 20.77) * scl, -7.15032 * scl, 18.4093 * scl));
+lightSource bedlight22(glm::vec3((-6.39886 + 20.77) * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3((-6.39886 + 20.77) * scl, 7.15032 * scl, 18.4093 * scl));
 bool draw3 = 1;
-lightSource cornerlight(glm::vec3(34.3285 * scl, 13.3838 * scl, 17.0802 * scl), true, glm::vec3(-11.2398 * scl, -3.28959 * scl, -12.6265 * scl));
+lightSource desklamp(glm::vec3(21.5796 * scl, 1.4167 * scl, -17.2829 * scl), true, glm::vec3(22.8042 * scl, -2.43597 * scl, -17.2353 * scl));
 bool draw4 = 1;
+lightSource hektarlight(glm::vec3(35.9581 * scl, 4.17864 * scl, 17.8685 * scl), true, glm::vec3(22.7725 * scl, -6.70588 * scl, 1.33307 * scl));
+bool draw5 = 1;
+lightSource cornerlight(glm::vec3(-16.405 * scl, 12.6004 * scl, -17.4967 * scl), true, glm::vec3(3.89842 * scl, -1.50879 * scl, 4.35974 * scl));
+bool draw6 = 1;
 bool debugmode = 0;
 
 // --------------------Function declarations--------------------
@@ -160,7 +169,6 @@ void fbo_add_tmp_to_res();
 void draw_scene(lightSource light);
 void draw_order(lightSource light);
 void draw_order(lightSource light, glm::mat4 textureMatrix);
-
 void draw_lights(lightSource light);
 
 // SDL functions
@@ -218,10 +226,15 @@ void init(void)
 	// --- Julius modeller ---
 	glm::vec3 sceneSize = glm::vec3(10 * scl, 10 * scl, 10 * scl);
 	glm::vec3 sceneTrans = glm::vec3(0 * scl, -10 * scl, 0 * scl);
-	glm::vec3 bambooTrans = glm::vec3(-16.2246*scl, 0 * scl, -17.2567*scl);
-	glm::vec3 doorTrans = glm::vec3(28.0168*scl, 0 * scl, 20.2156*scl);
+	glm::vec3 bambooTrans = glm::vec3(-16.2246 * scl, 0 * scl, -17.2567 * scl);
+	glm::vec3 doorTrans = glm::vec3(28.0168 * scl, 0 * scl, 20.2156 * scl);
 
-	lightsrc.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	lightsrc.MTWmatrix = glm::scale(glm::mat4(), sceneSize * scl);
+
+	m_bedside_lamp_lightbulb = Thing("objects/light_bulb.obj");
+	m_bedside_lamp_lightbulb = Thing("objects/light_bulb2.obj");
+	m_desk_lamp_lightbulb = Thing("objects/lamp_light_bulb.obj");
+	m_Hektar_light_bulb = Thing("objects/Hektar_light_bulb.obj");
 
 	m_bed = Thing("objects/bed.obj");
 	m_bedside_table = Thing("objects/bedside_table.obj");
@@ -229,7 +242,11 @@ void init(void)
 	m_bedside_table_doors = Thing("objects/bedside_table_doors.obj");
 	m_bedside_lamp = Thing("objects/bedside_lamp.obj");
 	m_bedside_lamp_shade = Thing("objects/bedside_lamp_shade.obj");
-	m_light_bulb = Thing("objects/light_bulb.obj");
+	m_bedside_table2 = Thing("objects/bedside_table2.obj");
+	m_bedside_table_handle2 = Thing("objects/bedside_table_handle2.obj");
+	m_bedside_table_doors2 = Thing("objects/bedside_table_doors2.obj");
+	m_bedside_lamp2 = Thing("objects/bedside_lamp2.obj");
+	m_bedside_lamp_shade2 = Thing("objects/bedside_lamp_shade2.obj");
 	m_mattress = Thing("objects/mattress.obj");
 	m_sheet_pillow = Thing("objects/sheet_pillow.obj");
 	m_books = Thing("objects/books.obj");
@@ -251,7 +268,8 @@ void init(void)
 	m_desk = Thing("objects/desk.obj");
 	m_desk_cap = Thing("objects/desk_cap.obj");
 	m_desk_handle = Thing("objects/desk_handle.obj");
-	m_lamp = Thing("objects/lamp.obj");
+	m_desk_lamp = Thing("objects/lamp.obj");
+	m_desk_lamp_holder = Thing("objects/lamp_holder.obj");
 	m_door = Thing("objects/door.obj");
 	m_door_frame = Thing("objects/door_frame.obj");
 	m_door_handle = Thing("objects/door_handle.obj");
@@ -259,19 +277,27 @@ void init(void)
 	m_floor = Thing("objects/floor.obj");
 	m_walls = Thing("objects/walls.obj");
 	m_ceiling = Thing("objects/ceiling.obj");
+	m_Hektar_lamp_shade = Thing("objects/Hektar_lamp_shade.obj");
+	m_Hektar_lamp_stand = Thing("objects/Hektar_lamp_stand.obj");
+	m_Hektar_light_bulb_stand = Thing("objects/Hektar_light_bulb_stand.obj");
 	m_TV = Thing("objects/TV.obj");
 	m_TV_granite = Thing("objects/TV_granite.obj");
 	m_TV_screen = Thing("objects/TV_screen.obj");
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
-	m_Hektar_lamp_shade = Thing("objects/Hektar_lamp_shade.obj");
-	m_Hektar_lamp_stand = Thing("objects/Hektar_lamp_stand.obj");
-	m_Hektar_light_bulb_stand = Thing("objects/Hektar_light_bulb_stand.obj");
-	m_Hektar_light_bulb = Thing("objects/Hektar_light_bulb.obj");
 	// -----------------------
 
     // Initiell placering och skalning av modeller.
+	m_bedside_lamp_lightbulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp_lightbulb.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_lightbulb.MTWmatrix;
+	m_bedside_lamp_lightbulb2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp_lightbulb2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_lightbulb2.MTWmatrix;
+	m_desk_lamp_lightbulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_lamp_lightbulb.MTWmatrix = glm::translate(sceneTrans) * m_desk_lamp_lightbulb.MTWmatrix;
+	m_Hektar_light_bulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_light_bulb.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb.MTWmatrix;
+
 	m_bed.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bed.MTWmatrix = glm::translate(sceneTrans) * m_bed.MTWmatrix;
 	m_bedside_table.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -284,9 +310,16 @@ void init(void)
 	m_bedside_lamp.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp.MTWmatrix;
 	m_bedside_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bedside_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_shade.MTWmatrix;
-	m_light_bulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_light_bulb.MTWmatrix = glm::translate(sceneTrans) * m_light_bulb.MTWmatrix;
-
+	m_bedside_table2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table2.MTWmatrix;
+	m_bedside_table_handle2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table_handle2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table_handle2.MTWmatrix;
+	m_bedside_table_doors2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_table_doors2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_table_doors2.MTWmatrix;
+	m_bedside_lamp2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp2.MTWmatrix;
+	m_bedside_lamp_shade2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_bedside_lamp_shade2.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_shade2.MTWmatrix;
 	m_bamboo1.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bamboo1.MTWmatrix = glm::translate(sceneTrans) * m_bamboo1.MTWmatrix;
 	m_bamboo1.MTWmatrix = glm::translate(bambooTrans) * m_bamboo1.MTWmatrix;
@@ -314,7 +347,6 @@ void init(void)
 	m_earth.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_earth.MTWmatrix = glm::translate(sceneTrans) * m_earth.MTWmatrix;
 	m_earth.MTWmatrix = glm::translate(bambooTrans) * m_earth.MTWmatrix;
-
 	m_mattress.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_mattress.MTWmatrix = glm::translate(sceneTrans) * m_mattress.MTWmatrix;
 	m_sheet_pillow.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -339,12 +371,13 @@ void init(void)
 	m_desk_cap.MTWmatrix = glm::translate(sceneTrans) * m_desk_cap.MTWmatrix;
 	m_desk_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_desk_handle.MTWmatrix = glm::translate(sceneTrans) * m_desk_handle.MTWmatrix;
-	m_lamp.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_lamp.MTWmatrix = glm::translate(sceneTrans) * m_lamp.MTWmatrix;
+	m_desk_lamp.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_lamp.MTWmatrix = glm::translate(sceneTrans) * m_desk_lamp.MTWmatrix;
+	m_desk_lamp_holder.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_lamp_holder.MTWmatrix = glm::translate(sceneTrans) * m_desk_lamp_holder.MTWmatrix;
 	m_door.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door.MTWmatrix = glm::translate(sceneTrans) * m_door.MTWmatrix;
 	m_door.MTWmatrix = glm::translate(doorTrans) * m_door.MTWmatrix;
-
 	m_door_frame.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_door_frame.MTWmatrix = glm::translate(sceneTrans) * m_door_frame.MTWmatrix;
 	m_door_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -355,6 +388,12 @@ void init(void)
 	m_door_keyhole.MTWmatrix = glm::translate(doorTrans) * m_door_keyhole.MTWmatrix;
 	m_floor.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_floor.MTWmatrix = glm::translate(sceneTrans) * m_floor.MTWmatrix;
+	m_Hektar_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_shade.MTWmatrix;
+	m_Hektar_light_bulb_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_light_bulb_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb_stand.MTWmatrix;
+	m_Hektar_lamp_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_lamp_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_stand.MTWmatrix;
 	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_walls.MTWmatrix = glm::translate(sceneTrans) * m_walls.MTWmatrix;
 	m_ceiling.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -371,24 +410,25 @@ void init(void)
 	m_window_handle.MTWmatrix = glm::translate(sceneTrans) * m_window_handle.MTWmatrix;
 	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
-	m_Hektar_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_Hektar_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_shade.MTWmatrix;
-	m_Hektar_light_bulb_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_Hektar_light_bulb_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb_stand.MTWmatrix;
-	m_Hektar_lamp_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_Hektar_lamp_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_stand.MTWmatrix;
-	m_Hektar_light_bulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_Hektar_light_bulb.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb.MTWmatrix;
 
 
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
+	objlist.push_back(m_bedside_lamp_lightbulb);
+	objlist.push_back(m_bedside_lamp_lightbulb2);
+	objlist.push_back(m_desk_lamp_lightbulb);
+	objlist.push_back(m_Hektar_light_bulb);
+
 	objlist.push_back(m_bed);
 	objlist.push_back(m_bedside_table);
 	objlist.push_back(m_bedside_table_handle);
 	objlist.push_back(m_bedside_table_doors);
 	objlist.push_back(m_bedside_lamp);
 	objlist.push_back(m_bedside_lamp_shade);
-	objlist.push_back(m_light_bulb);
+	objlist.push_back(m_bedside_table2);
+	objlist.push_back(m_bedside_table_handle2);
+	objlist.push_back(m_bedside_table_doors2);
+	objlist.push_back(m_bedside_lamp2);
+	objlist.push_back(m_bedside_lamp_shade2);
 	objlist.push_back(m_bamboo1);
 	objlist.push_back(m_bamboo2);
 	objlist.push_back(m_bamboo3);
@@ -410,25 +450,24 @@ void init(void)
 	objlist.push_back(m_desk);
 	objlist.push_back(m_desk_cap);
 	objlist.push_back(m_desk_handle);
+	objlist.push_back(m_desk_lamp);
+	objlist.push_back(m_desk_lamp_holder);
 	objlist.push_back(m_door);
 	objlist.push_back(m_door_frame);
 	objlist.push_back(m_door_handle);
 	objlist.push_back(m_door_keyhole);
-	objlist.push_back(m_lamp);
 	objlist.push_back(m_floor);
 	objlist.push_back(m_walls);
 	objlist.push_back(m_ceiling);
+	objlist.push_back(m_Hektar_lamp_shade);
+	objlist.push_back(m_Hektar_light_bulb_stand);
+	objlist.push_back(m_Hektar_lamp_stand);
 	objlist.push_back(m_TV);
 	objlist.push_back(m_TV_granite);
 	objlist.push_back(m_TV_screen);
 	objlist.push_back(m_TV_table);
 	objlist.push_back(m_window_handle);
 	objlist.push_back(m_windows);
-
-	objlist.push_back(m_Hektar_lamp_shade);
-	objlist.push_back(m_Hektar_light_bulb_stand);
-	objlist.push_back(m_Hektar_lamp_stand);
-	objlist.push_back(m_Hektar_light_bulb);
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
@@ -444,7 +483,10 @@ void init(void)
     sunlight.projectionMatrix = lightpersp;
 	bedlight1.projectionMatrix = lightpersp;
 	bedlight2.projectionMatrix = lightpersp;
+	bedlight21.projectionMatrix = lightpersp;
+	bedlight22.projectionMatrix = lightpersp;
 	desklamp.projectionMatrix = lightpersp;
+	hektarlight.projectionMatrix = lightpersp;
 	cornerlight.projectionMatrix = lightpersp;
 	//spotlight.projectionMatrix = glm::ortho(0.0f, float(width), 0.0f, float(height), 1.0f, 1000.0f);
 
@@ -460,14 +502,10 @@ void display(void)
 	// * Lägg på bloom (och kanske motion blur?)
 	// * Putsa
 
-	// Rensa framebuffer & z-buffer.
+	// Rensa framebuffers & z-buffer.
 	glClearColor(0.0, 0.0, 0.0, 0);
 	useFBO(res_fbo, 0L, 0L);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Aktivera shaderprogrammet.
-	//glUseProgram(zshader);
-	glClearColor(0.0, 0.0, 0.0, 0);
 	useFBO(tmp_fbo, 0L, 0L);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     useFBO(z_fbo, 0L, 0L);
@@ -488,9 +526,18 @@ void display(void)
 	}
 	if (draw3)
 	{
-		draw_scene(desklamp);
+		draw_scene(bedlight21);
+		draw_scene(bedlight22);
 	}
 	if (draw4)
+	{
+		draw_scene(desklamp);
+	}
+	if (draw5)
+	{
+		draw_scene(hektarlight);
+	}
+	if (draw6)
 	{
 		draw_scene(cornerlight);
 	}
@@ -509,9 +556,18 @@ void display(void)
 		}
 		if (draw3)
 		{
-			draw_lights(desklamp);
+			draw_lights(bedlight1);
+			draw_lights(bedlight2);
 		}
 		if (draw4)
+		{
+			draw_lights(desklamp);
+		}
+		if (draw5)
+		{
+			draw_lights(hektarlight);
+		}
+		if (draw6)
 		{
 			draw_lights(cornerlight);
 		}
@@ -522,10 +578,6 @@ void display(void)
 	useFBO(0L, res_fbo, 0L);
 	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");
 
-	/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	useFBO(0L, z_fbo, 0L);
-	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");*/
-
     swap_buffers();
 }
 
@@ -534,17 +586,11 @@ void fbo_add_tmp_to_res()
 	// Adds two fbos (tmp_fbo and res_fbo) to res_fbo
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-
 	glUseProgram(addshader);
-	useFBO(res_fbo, tmp_fbo, 0L);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tmp_fbo->texid);
+	useFBO(res_fbo, res_fbo, tmp_fbo);
 	glUniform1i(glGetUniformLocation(addshader, "texUnit"), 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, res_fbo->texid);
 	glUniform1i(glGetUniformLocation(addshader, "texUnit2"), 1);
 	DrawModel(squareModel, addshader, "in_Position", NULL, "in_TexCoord");
-	glActiveTexture(GL_TEXTURE0);
 }
 
 void draw_scene(lightSource light)
@@ -571,10 +617,8 @@ void draw_scene(lightSource light)
 	glUniformMatrix4fv(glGetUniformLocation(zshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
 	// ----------------Scenen renderas till z-buffern ----------------
-
 	draw_order(light);
-
-	// -------------------------------------------------------------
+	// ---------------------------------------------------------------
 
 	glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
 
@@ -596,15 +640,11 @@ void draw_scene(lightSource light)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// ---------------- Scenen renderas till tmp_fbo ----------------
-	
 	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
 	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	draw_order(light, textureMatrix);
-
-	// -------------------------------------------------------------
+	// --------------------------------------------------------------
 
 	// Scenen adderas till res_fbo
 	fbo_add_tmp_to_res();
@@ -614,7 +654,10 @@ void draw_order(lightSource light)
 {
 	for (int n = 0; n < objlist.size(); n++)
 	{
-		objlist.at(n).draw(zshader);
+		if (n >= lightbulbs)
+		{
+			objlist.at(n).draw(zshader);
+		}
 	}
 }
 
@@ -631,7 +674,7 @@ void draw_lights(lightSource light)
 	// Rita ut ljuskällor
 	glUseProgram(shadowphongshader);
 	useFBO(tmp_fbo, 0L, 0L);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -741,8 +784,22 @@ void handle_keypress(SDL_Event event)
 	case SDLK_4:
 		draw4 = !draw4;
 		break;
+	case SDLK_5:
+		draw5 = !draw5;
+		break;
+	case SDLK_6:
+		draw6 = !draw6;
+		break;
 	case SDLK_z:
 		debugmode = !debugmode;
+		if (debugmode)
+		{
+			std::cout << "Debug mode on!\n";
+		}
+		else
+		{
+			std::cout << "Debug mode off!\n";
+		}
 		break;
 	case SDLK_UP:
 	    sunlight.move(glm::vec3(0, 0, -1));
@@ -763,22 +820,22 @@ void handle_keypress(SDL_Event event)
 		sunlight.move(glm::vec3(0, -1, 0));
 	    break;
 	case SDLK_KP_8:
-		cornerlight.move(glm::vec3(0, 0, -0.1));
+		hektarlight.move(glm::vec3(0, 0, -0.1));
 		break;
 	case SDLK_KP_2:
-		cornerlight.move(glm::vec3(0, 0, 0.1));
+		hektarlight.move(glm::vec3(0, 0, 0.1));
 		break;
 	case SDLK_KP_4:
-		cornerlight.move(glm::vec3(-0.1, 0, 0));
+		hektarlight.move(glm::vec3(-0.1, 0, 0));
 		break;
 	case SDLK_KP_6:
-		cornerlight.move(glm::vec3(0.1, 0, 0));
+		hektarlight.move(glm::vec3(0.1, 0, 0));
 		break;
 	case SDLK_KP_7:
-		cornerlight.move(glm::vec3(0, 0.1, 0));
+		hektarlight.move(glm::vec3(0, 0.1, 0));
 		break;
 	case SDLK_KP_1:
-		cornerlight.move(glm::vec3(0, -0.1, 0));
+		hektarlight.move(glm::vec3(0, -0.1, 0));
 		break;
 	// Print camera position for debugging
 	case SDLK_p:
