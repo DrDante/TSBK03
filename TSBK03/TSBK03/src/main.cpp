@@ -75,6 +75,8 @@ Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo
 Thing m_bamboo_leaf, m_flower_pot, m_earth;											
+Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand;										// Hektar Ikea lampa
+Thing m_Hektar_light_bulb, m_Hektar_light_bulb_stand;
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -263,6 +265,10 @@ void init(void)
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
+	m_Hektar_lamp_shade = Thing("objects/Hektar_lamp_shade.obj");
+	m_Hektar_lamp_stand = Thing("objects/Hektar_lamp_stand.obj");
+	m_Hektar_light_bulb_stand = Thing("objects/Hektar_light_bulb_stand.obj");
+	m_Hektar_light_bulb = Thing("objects/Hektar_light_bulb.obj");
 	// -----------------------
 
     // Initiell placering och skalning av modeller.
@@ -365,6 +371,15 @@ void init(void)
 	m_window_handle.MTWmatrix = glm::translate(sceneTrans) * m_window_handle.MTWmatrix;
 	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
+	m_Hektar_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_shade.MTWmatrix;
+	m_Hektar_light_bulb_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_light_bulb_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb_stand.MTWmatrix;
+	m_Hektar_lamp_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_lamp_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_stand.MTWmatrix;
+	m_Hektar_light_bulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_Hektar_light_bulb.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb.MTWmatrix;
+
 
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
 	objlist.push_back(m_bed);
@@ -409,6 +424,11 @@ void init(void)
 	objlist.push_back(m_TV_table);
 	objlist.push_back(m_window_handle);
 	objlist.push_back(m_windows);
+
+	objlist.push_back(m_Hektar_lamp_shade);
+	objlist.push_back(m_Hektar_light_bulb_stand);
+	objlist.push_back(m_Hektar_lamp_stand);
+	objlist.push_back(m_Hektar_light_bulb);
 
     // Scale and bias för shadow map
     scaleBiasMatrix = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.5, 0.5, 0.5)), glm::vec3(1,1,1));
