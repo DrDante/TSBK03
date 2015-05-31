@@ -110,8 +110,8 @@ FBOstruct *z_fbo, *tmp_fbo, *res_fbo;
 // Shaders.
 GLuint shadowphongshader = 0, zshader = 0, addshader = 0, plainshader = 0; // passthrough shader;
 // Skärmstorlek
-int width = 1024; 
-int height = 768; 
+int width = 1024;
+int height = 768;
 // Övrigt.
 
 // Bias som används för att undvika skuggacne, används i shadowphong.frag
@@ -502,6 +502,10 @@ void display(void)
 	useFBO(0L, res_fbo, 0L);
 	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");
 
+	/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	useFBO(0L, z_fbo, 0L);
+	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");*/
+
     swap_buffers();
 }
 
@@ -531,8 +535,8 @@ void draw_scene(lightSource light)
 
 	// Aktivera z-buffering
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	// Flytta kamera till ljuskällan
 	glm::vec3 tmp_cam_pos = cam.position;
@@ -576,7 +580,8 @@ void draw_scene(lightSource light)
 	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
 	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
-	
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	draw_order(light, textureMatrix);
 
 	// -------------------------------------------------------------
@@ -712,6 +717,9 @@ void handle_keypress(SDL_Event event)
 		break;
 	case SDLK_3:
 		draw3 = !draw3;
+		break;
+	case SDLK_4:
+		draw4 = !draw4;
 		break;
 	case SDLK_z:
 		debugmode = !debugmode;

@@ -14,7 +14,7 @@ uniform vec2 pixelDiff;
 uniform vec3 lPos;	// Ljuspositionen.
 
 vec3 r;
-vec3 s;			// Infallande ljus.
+vec3 s;				// Infallande ljus.
 vec3 eye;			// Vektor från objektet till kameran.
 
 int isDirectional;
@@ -73,21 +73,26 @@ void main(void)
 
 	float depth = 0;
 
-	// filter_sidexfilter_side filtrering för snyggare skuggor
-	int filter_side = 9;
-	for(int y = -(filter_side-1)/2; y <= (filter_side-1)/2;y++){
-		for(int x = -(filter_side-1)/2; x <= (filter_side-1)/2;x++){
-			depth += texture(texUnit, vec3(shadowCoord.x+x*pixelDiff.x, shadowCoord.y+y*pixelDiff.y, shadowCoord.z));
+	// filter_side x filter_side filtrering för snyggare skuggor
+	int filter_side = 5;
+	for(int y = -(filter_side - 1)/2; y <= (filter_side - 1)/2; y++)
+	{
+		for(int x = -(filter_side - 1)/2; x <= (filter_side - 1)/2; x++)
+		{
+			float currTex = 0.0;
+			if(shadowCoord.x + x*pixelDiff.x > 0.0 && shadowCoord.y + y*pixelDiff.y > 0.0 && shadowCoord.x + x*pixelDiff.x < 1.0 && shadowCoord.y + y*pixelDiff.y < 1.0)
+			{
+				currTex = texture(texUnit, vec3(shadowCoord.x + x*pixelDiff.x, shadowCoord.y + y*pixelDiff.y, shadowCoord.z));
+				depth += currTex;
+			}
 		}
 	}
-	depth /= filter_side*filter_side;
+	depth /= (filter_side*filter_side); // EGENTLIGEN dividerar man med för mycket i vissa fall, men det kommer inte märkas i praktiken.
 	
 	distance = length(outObjPos - lPos);
-	//cutoff = 50;
-	//rangeComp = max((cutoff - distance)/cutoff, 0.05);
-	rangeComp = 10000/(10000+distance*distance);
+	int kappa = 10000; // Påverkar hur snabbt ljusintensitet avtar m.a.p. avstånd.
+	rangeComp = kappa/(kappa + distance*distance);
 
-	//out_color = vec4(vec3(depth), 1);
-	totalLight = totalLight * depth* rangeComp;
+	totalLight = totalLight * depth * rangeComp;
 	out_color = vec4(totalLight, 1);
 }
