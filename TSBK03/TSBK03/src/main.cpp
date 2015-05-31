@@ -123,7 +123,7 @@ int height = 768;
 // Bias som används för att undvika skuggacne, används i shadowphong.frag
 float bias = 0.0001;
 
-//GLfloat t = 0;	// Tidsvariabel.
+GLfloat t = 0;	// Tidsvariabel.
 
 // --------------------Ljuskälla-----------------------------
 class lightSource 
@@ -146,25 +146,35 @@ class lightSource
 };
  
 lightSource sunlight(glm::vec3(-28.6608 * scl, 14.3395 * scl, 13.0906 * scl), true, glm::vec3(-5.28038 * scl, -6.90153 * scl, -15.4778 * scl));
-bool draw1 = 1;
+bool draw1 = true;
 lightSource bedlight1(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, -7.15032 * scl, 18.4093 * scl));
 lightSource bedlight2(glm::vec3(-6.39886 * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3(-6.39886 * scl, 7.15032 * scl, 18.4093 * scl));
-bool draw2 = 1;
+bool draw2 = true;
 lightSource bedlight21(glm::vec3((-6.39886 + 20.77) * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3((-6.39886 + 20.77) * scl, -7.15032 * scl, 18.4093 * scl));
 lightSource bedlight22(glm::vec3((-6.39886 + 20.77) * scl, -3.91051 * scl, 18.4094 * scl), true, glm::vec3((-6.39886 + 20.77) * scl, 7.15032 * scl, 18.4093 * scl));
-bool draw3 = 1;
+bool draw3 = true;
 lightSource desklamp(glm::vec3(21.5796 * scl, 1.4167 * scl, -17.2829 * scl), true, glm::vec3(22.8042 * scl, -2.43597 * scl, -17.2353 * scl));
-bool draw4 = 1;
+bool draw4 = true;
 lightSource hektarlight(glm::vec3(35.9581 * scl, 4.17864 * scl, 17.8685 * scl), true, glm::vec3(22.7725 * scl, -6.70588 * scl, 1.33307 * scl));
-bool draw5 = 1;
+bool draw5 = true;
 lightSource cornerlight(glm::vec3(-16.405 * scl, 12.6004 * scl, -17.4967 * scl), true, glm::vec3(3.89842 * scl, -1.50879 * scl, 4.35974 * scl));
-bool draw6 = 1;
-bool debugmode = 0;
+bool draw6 = true;
+bool debugmode = false;
+
+bool isDoorRotating = false;
+bool isDoorClosed = true;
+int doorObjPos;
+glm::vec3 totalDoorTrans;
+int doorAngleMult = 0;
+const float doorAngle = float(-2.0 * PI / 3.0);
+const float doorAngleIncr = float(-PI / 90.0);
+const float doorAngleMultLim = doorAngle / doorAngleIncr;
 
 // --------------------Function declarations--------------------
 void OnTimer(int value);
 void reshape(int w, int h, glm::mat4 &projectionMatrix);
 void idle();
+void RotateDoor();
 void fbo_add_tmp_to_res();
 void draw_scene(lightSource light);
 void draw_order(lightSource light);
@@ -228,6 +238,7 @@ void init(void)
 	glm::vec3 sceneTrans = glm::vec3(0 * scl, -10 * scl, 0 * scl);
 	glm::vec3 bambooTrans = glm::vec3(-16.2246 * scl, 0 * scl, -17.2567 * scl);
 	glm::vec3 doorTrans = glm::vec3(28.0168 * scl, 0 * scl, 20.2156 * scl);
+	totalDoorTrans = sceneTrans + doorTrans;
 
 	lightsrc.MTWmatrix = glm::scale(glm::mat4(), sceneSize * scl);
 
@@ -453,6 +464,7 @@ void init(void)
 	objlist.push_back(m_desk_lamp);
 	objlist.push_back(m_desk_lamp_holder);
 	objlist.push_back(m_door);
+	doorObjPos = objlist.size() - 1;
 	objlist.push_back(m_door_frame);
 	objlist.push_back(m_door_handle);
 	objlist.push_back(m_door_keyhole);
@@ -512,8 +524,13 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Öka tidsvariabeln t.
-    //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+    t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 	
+	if (isDoorRotating)
+	{
+		RotateDoor();
+	}
+
 	// Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo
 	if (draw1)
 	{
@@ -579,6 +596,47 @@ void display(void)
 	DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");
 
     swap_buffers();
+}
+
+void RotateDoor()
+{
+	doorAngleMult++;
+	Thing door = objlist.at(doorObjPos);
+	Thing handle = objlist.at(doorObjPos + 2);
+	Thing keyhole = objlist.at(doorObjPos + 3);
+	door.MTWmatrix = glm::translate(-totalDoorTrans) * door.MTWmatrix;
+	handle.MTWmatrix = glm::translate(-totalDoorTrans) * handle.MTWmatrix;
+	keyhole.MTWmatrix = glm::translate(-totalDoorTrans) * keyhole.MTWmatrix;
+	if (isDoorClosed)
+	{
+		door.MTWmatrix = glm::rotate(door.MTWmatrix, doorAngleIncr, glm::vec3(0, 1, 0));
+		handle.MTWmatrix = glm::rotate(handle.MTWmatrix, doorAngleIncr, glm::vec3(0, 1, 0));
+		keyhole.MTWmatrix = glm::rotate(keyhole.MTWmatrix, doorAngleIncr, glm::vec3(0, 1, 0));
+		if (doorAngleMult >= doorAngleMultLim)
+		{
+			isDoorRotating = false;
+			isDoorClosed = false;
+			doorAngleMult = 0;
+		}
+	}
+	else
+	{
+		door.MTWmatrix = glm::rotate(door.MTWmatrix, -doorAngleIncr, glm::vec3(0, 1, 0));
+		handle.MTWmatrix = glm::rotate(handle.MTWmatrix, -doorAngleIncr, glm::vec3(0, 1, 0));
+		keyhole.MTWmatrix = glm::rotate(keyhole.MTWmatrix, -doorAngleIncr, glm::vec3(0, 1, 0));
+		if (doorAngleMult >= doorAngleMultLim)
+		{
+			isDoorRotating = false;
+			isDoorClosed = true;
+			doorAngleMult = 0;
+		}
+	}
+	door.MTWmatrix = glm::translate(totalDoorTrans) * door.MTWmatrix;
+	handle.MTWmatrix = glm::translate(totalDoorTrans) * handle.MTWmatrix;
+	keyhole.MTWmatrix = glm::translate(totalDoorTrans) * keyhole.MTWmatrix;
+	objlist.at(doorObjPos) = door;
+	objlist.at(doorObjPos + 2) = handle;
+	objlist.at(doorObjPos + 3) = keyhole;
 }
 
 void fbo_add_tmp_to_res()
@@ -799,6 +857,12 @@ void handle_keypress(SDL_Event event)
 		else
 		{
 			std::cout << "Debug mode off!\n";
+		}
+		break;
+	case SDLK_x:
+		if (!isDoorRotating)
+		{
+			isDoorRotating = true;
 		}
 		break;
 	case SDLK_UP:
