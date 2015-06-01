@@ -272,16 +272,16 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling_bulb1);					// WHITE
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling_bulb2);					// WHITE
 	
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bed);						//
+	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bed);						//
 	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_handle);		//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_doors);		//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_lamp);				//
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_bedside_table_handle);		//
+	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table_doors);		//
+	LoadTGATextureSimple("objects/textures/tga/silver_gray.tga", &t_bedside_lamp);				//
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade);					//FIXA
 	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table2);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_handle2);		//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_doors2);		//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_lamp2);				//
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_bedside_table_handle2);		//
+	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table_doors2);		//
+	LoadTGATextureSimple("objects/textures/tga/silver_gray.tga", &t_bedside_lamp2);				//
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade2);				//FIXA
 	LoadTGATextureSimple("objects/textures/tga/mattress.tga", &t_mattress);
 	LoadTGATextureSimple("objects/textures/tga/sheet_pillow.tga", &t_sheet_pillow);
@@ -293,37 +293,37 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);
 	LoadTGATextureSimple("objects/textures/tga/leaf.tga", &t_bamboo_leaf);
 	LoadTGATextureSimple("objects/textures/tga/flower_pot.tga", &t_flower_pot);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_earth);						//
+	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_earth);						//
 	LoadTGATextureSimple("objects/textures/tga/BOOKS_TEXTURE.tga", &t_books);
 	LoadTGATextureSimple("objects/textures/tga/SHELF_TEXTURE.tga", &t_bookshelf);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling_lamp1);				//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling_lamp2);				//
+	LoadTGATextureSimple("objects/textures/tga/dark_white.tga", &t_ceiling_lamp1);				//
+	LoadTGATextureSimple("objects/textures/tga/dark_white.tga", &t_ceiling_lamp2);				//
 	LoadTGATextureSimple("objects/textures/tga/chair_seat_&_back.tga", &t_chair_back);
 	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_chair_legs);
 	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_chair_lower_part);
 	LoadTGATextureSimple("objects/textures/tga/chair_seat_&_back.tga", &t_chair_seat);
 	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_chair_wheels);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk);						//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_cap);					//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_handle);				//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_lamp);					//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_lamp_holder);			//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door);						//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_frame);				//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_handle);				//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_keyhole);				//
+	LoadTGATextureSimple("objects/textures/tga/desk.tga", &t_desk);						//
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_desk_cap);					//
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_desk_handle);				//
+	LoadTGATextureSimple("objects/textures/tga/DarkRed.tga", &t_desk_lamp);					//
+	LoadTGATextureSimple("objects/textures/tga/DarkRed.tga", &t_desk_lamp_holder);			//
+	LoadTGATextureSimple("objects/textures/tga/Door.tga", &t_door);						//
+	LoadTGATextureSimple("objects/textures/tga/Door.tga", &t_door_frame);				//
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_door_handle);				//
+	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_door_keyhole);				//
 	LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling);					//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_walls);						//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_floor2);					// samma som floor ovan?
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling2);					//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_walls2);					//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_lamp_shade);			//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_lamp_stand);			//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_light_bulb_stand);	//
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_TV);						// TV.tga funkar inte av någon anledning
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling);					//
+	LoadTGATextureSimple("objects/textures/tga/tapet1.tga", &t_walls);						//
+	LoadTGATextureSimple("objects/textures/tga/floor2.tga", &t_floor2);					// samma som floor ovan?
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling2);					//
+	LoadTGATextureSimple("objects/textures/tga/tapet2.tga", &t_walls2);					//
+	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_shade);			//
+	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_stand);			//
+	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_light_bulb_stand);	//
+	LoadTGATextureSimple("objects/textures/tga/TV.tga", &t_TV);						// TV.tga funkar inte av någon anledning
 	LoadTGATextureSimple("objects/textures/tga/TV_granite.tga", &t_TV_granite);
-	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_TV_screen);					//
+	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_TV_screen);					//
 	LoadTGATextureSimple("objects/textures/tga/TV_table.tga", &t_TV_table);
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_windows);
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_window_handle);
