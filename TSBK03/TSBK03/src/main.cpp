@@ -151,7 +151,7 @@ int height = 768;
 // Bias som används för att undvika skuggacne, används i shadowphong.frag
 float bias = 0.0001;
 
-GLfloat t = 0;	// Tidsvariabel.
+//GLfloat t = 0;	// Tidsvariabel.
 
 // --------------------Ljuskälla-----------------------------
 class lightSource 
@@ -270,10 +270,10 @@ void init(void)
 
 
 	// Texturer
-	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_bedside_lamp_lightbulb);			// WHITE		fixa position
+	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb1.tga", &t_bedside_lamp_lightbulb);
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb2.tga", &t_bedside_lamp_lightbulb2);
-	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);				// WHITE
-	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_Hektar_light_bulb);				// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);								// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_Hektar_light_bulb);								// WHITE
 	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb1.tga", &t_ceiling_lamp_lightbulb1);
 	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb2.tga", &t_ceiling_lamp_lightbulb2);		//
 	
@@ -281,7 +281,7 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/bedside_table.tga", &t_bedside_table);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_handle.tga", &t_bedside_table_handle);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_doors.tga", &t_bedside_table_doors);
-	LoadTGATextureSimple("objects/textures/tga/bedside_lamp.tga", &t_bedside_lamp);					//
+	LoadTGATextureSimple("objects/textures/tga/bedside_lamp.tga", &t_bedside_lamp);						//
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade);			//
 	LoadTGATextureSimple("objects/textures/tga/bedside_table2.tga", &t_bedside_table2);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_handle2.tga", &t_bedside_table_handle2);
@@ -290,18 +290,18 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade2.tga", &t_bedside_lamp_shade2);
 	LoadTGATextureSimple("objects/textures/tga/mattress.tga", &t_mattress);
 	LoadTGATextureSimple("objects/textures/tga/sheet_pillow.tga", &t_sheet_pillow);						//
-	LoadTGATextureSimple("objects/textures/tga/bamboo1.tga", &t_bamboo1);								//
-	LoadTGATextureSimple("objects/textures/tga/bamboo2.tga", &t_bamboo2);								//
-	LoadTGATextureSimple("objects/textures/tga/bamboo3.tga", &t_bamboo3);								//
-	LoadTGATextureSimple("objects/textures/tga/bamboo4.tga", &t_bamboo4);								//
-	LoadTGATextureSimple("objects/textures/tga/bamboo5.tga", &t_bamboo5);								//
-	LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);								//
+	LoadTGATextureSimple("objects/textures/tga/bamboo1.tga", &t_bamboo1);
+	LoadTGATextureSimple("objects/textures/tga/bamboo2.tga", &t_bamboo2);
+	LoadTGATextureSimple("objects/textures/tga/bamboo3.tga", &t_bamboo3);
+	LoadTGATextureSimple("objects/textures/tga/bamboo4.tga", &t_bamboo4);
+	LoadTGATextureSimple("objects/textures/tga/bamboo5.tga", &t_bamboo5);
+	LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);
 	LoadTGATextureSimple("objects/textures/tga/bamboo_leaf.tga", &t_bamboo_leaf);						//
 	LoadTGATextureSimple("objects/textures/tga/flower_pot.tga", &t_flower_pot);
 	LoadTGATextureSimple("objects/textures/tga/earth.tga", &t_earth);
 	LoadTGATextureSimple("objects/textures/tga/books.tga", &t_books);
 	LoadTGATextureSimple("objects/textures/tga/bookshelf.tga", &t_bookshelf);
-	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);						//
+	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);					//
 	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp2.tga", &t_ceiling_lamp2);
 	LoadTGATextureSimple("objects/textures/tga/chair_back.tga", &t_chair_back);
 	//LoadTGATextureSimple("objects/textures/tga/chair_legs.tga", &t_chair_legs);
@@ -327,7 +327,7 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/tapet2.tga", &t_walls2);									//
 	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_shade);					//
 	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_stand);					//
-	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_light_bulb_stand);
+	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_light_bulb_stand);				//
 	LoadTGATextureSimple("objects/textures/tga/TV.tga", &t_TV);
 	LoadTGATextureSimple("objects/textures/tga/TV_granite.tga", &t_TV_granite);
 	LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_TV_screen);
@@ -336,9 +336,6 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_window_handle);
 	LoadTGATextureSimple("objects/textures/tga/laptop.tga", &t_laptop);
 	LoadTGATextureSimple("objects/textures/tga/screen.tga", &t_laptop_screen);
-	
-
-	// Unused: lamp.tga, red.tga, TV.tga (funkar ej), Silver-Texture-Wallpapers-and-Backgrounds-1024x819
 	// --------
 
     // Laddning av modeller.
@@ -358,7 +355,7 @@ void init(void)
 	lightsrc.MTWmatrix = glm::scale(glm::mat4(), sceneSize * scl);
 
 	m_bedside_lamp_lightbulb = Thing("objects/light_bulb.obj");
-	m_bedside_lamp_lightbulb = Thing("objects/light_bulb2.obj");
+	m_bedside_lamp_lightbulb2 = Thing("objects/light_bulb2.obj");
 	m_desk_lamp_lightbulb = Thing("objects/desk_lamp_light_bulb.obj");
 	m_Hektar_light_bulb = Thing("objects/Hektar_light_bulb.obj");
 	m_ceiling_lamp_lightbulb1 = Thing("objects/ceiling_lamp_lightbulbs1.obj");
@@ -744,10 +741,7 @@ void init(void)
 void display(void)
 {
 	// TODO
-	// 1 Bygg scen (texturer)
-	// 2 Animering, någon slags rörelsesystem(inkl kollisionsdetection ? ), knappar för att stänga av ljuskällor
-	// 3 Ordna objektberoende phongparametrar
-	// 4 (Bygg system för ljuskällegeometri + penumbra)
+	// * Ordna objektberoende phongparametrar
 	// * Lägg på bloom (och kanske motion blur?)
 	// * Putsa
 
@@ -761,7 +755,7 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Öka tidsvariabeln t.
-    t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+    //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 	
 	if (isDoorRotating)
 	{
