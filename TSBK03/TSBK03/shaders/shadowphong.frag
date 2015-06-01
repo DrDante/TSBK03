@@ -6,8 +6,10 @@ in vec4 lightSourceCoord;
 in vec3 outNormal;
 in vec3 outCamPos;
 in vec3 outObjPos;
+in vec2 outTexCoord;
 
 uniform sampler2DShadow texUnit;
+uniform sampler2D texUnit2;
 uniform float bias;
 uniform vec2 pixelDiff;
 
@@ -93,6 +95,6 @@ void main(void)
 	int kappa = 10000; // Påverkar hur snabbt ljusintensitet avtar m.a.p. avstånd.
 	rangeComp = kappa/(kappa + distance*distance);
 
-	totalLight = totalLight * depth * rangeComp;
+	totalLight = vec3(texture(texUnit2, outTexCoord)) * totalLight * depth * rangeComp;
 	out_color = vec4(totalLight, 1);
 }

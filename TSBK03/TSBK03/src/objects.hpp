@@ -20,6 +20,7 @@ class Thing
 
 	// Draw to screen with depthtexture 
 	void draw_with_depthinfo(GLuint shader, glm::mat4 &textureMatrix);
+	void draw_with_depthinfo(GLuint shader, glm::mat4 &textureMatrix, GLuint *tex);
 	void draw_with_depthinfo(GLuint shader, glm::mat4 &textureMatrix, Model* ext_model);
 	Model *model;
 };

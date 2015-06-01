@@ -78,13 +78,35 @@ Thing m_ceiling_lamp1, m_ceiling_lamp2;												// Taklampor.
 Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
 Thing m_desk, m_desk_cap, m_desk_handle, m_desk_lamp, m_desk_lamp_holder;			// Desk, etc.
 Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
-Thing m_floor, m_walls, m_ceiling;													// Golv, väggar.
+Thing m_floor, m_ceiling, m_walls;													// Golv, väggar.
+Thing m_floor2, m_ceiling2, m_walls2;												// Rum 2.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
-Thing m_ceiling2, m_walls2, m_floor2;													// Rum 2
 float scl = 6;
 std::vector<Thing> objlist;
+
+// Texturer
+GLuint t_bedside_lamp_lightbulb, t_bedside_lamp_lightbulb2;
+GLuint t_desk_lamp_lightbulb, t_Hektar_light_bulb, t_ceiling_bulb1, t_ceiling_bulb2;
+GLuint t_bamboo1, t_bamboo2, t_bamboo3, t_bamboo4, t_bamboo5, t_bamboo6;
+GLuint t_bamboo_leaf, t_earth, t_flower_pot;
+GLuint t_bed, t_mattress, t_sheet_pillow;
+GLuint t_bedside_lamp, t_bedside_lamp_shade;
+GLuint t_bedside_table, t_bedside_table_handle, t_bedside_table_doors;
+GLuint t_bedside_lamp2, t_bedside_lamp_shade2;
+GLuint t_bedside_table2, t_bedside_table_handle2, t_bedside_table_doors2;
+GLuint t_books, t_bookshelf;
+GLuint t_ceiling_lamp1, t_ceiling_lamp2;
+GLuint t_chair_back, t_chair_legs, t_chair_lower_part, t_chair_seat, t_chair_wheels;
+GLuint t_desk, t_desk_cap, t_desk_handle, t_desk_lamp, t_desk_lamp_holder;
+GLuint t_door, t_door_frame, t_door_handle, t_door_keyhole;
+GLuint t_floor, t_ceiling, t_walls;
+GLuint t_floor2, t_ceiling2, t_walls2;
+GLuint t_TV, t_TV_granite, t_TV_screen, t_TV_table;
+GLuint t_window_handle, t_windows;
+GLuint t_Hektar_lamp_shade, t_Hektar_lamp_stand, t_Hektar_light_bulb_stand;
+std::vector<GLuint> texlist;
 
 // Model
 Model *wallModel;
@@ -241,6 +263,74 @@ void init(void)
     
     printError("init shader");
 
+
+	// Texturer
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_bedside_lamp_lightbulb);			// WHITE		fixa position
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_bedside_lamp_lightbulb2);			// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);				// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_Hektar_light_bulb);				// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling_bulb1);					// WHITE
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling_bulb2);					// WHITE
+	
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bed);						//
+	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_handle);		//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_doors);		//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_lamp);				//
+	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade);					//FIXA
+	LoadTGATextureSimple("objects/textures/tga/bed_bedTable.tga", &t_bedside_table2);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_handle2);		//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_table_doors2);		//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_bedside_lamp2);				//
+	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade2);				//FIXA
+	LoadTGATextureSimple("objects/textures/tga/mattress.tga", &t_mattress);
+	LoadTGATextureSimple("objects/textures/tga/sheet_pillow.tga", &t_sheet_pillow);
+	LoadTGATextureSimple("objects/textures/tga/bamboo1.tga", &t_bamboo1);
+	LoadTGATextureSimple("objects/textures/tga/bamboo2.tga", &t_bamboo2);
+	LoadTGATextureSimple("objects/textures/tga/bamboo3.tga", &t_bamboo3);
+	LoadTGATextureSimple("objects/textures/tga/bamboo4.tga", &t_bamboo4);
+	LoadTGATextureSimple("objects/textures/tga/bamboo5.tga", &t_bamboo5);
+	LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);
+	LoadTGATextureSimple("objects/textures/tga/leaf.tga", &t_bamboo_leaf);
+	LoadTGATextureSimple("objects/textures/tga/flower_pot.tga", &t_flower_pot);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_earth);						//
+	LoadTGATextureSimple("objects/textures/tga/BOOKS_TEXTURE.tga", &t_books);
+	LoadTGATextureSimple("objects/textures/tga/SHELF_TEXTURE.tga", &t_bookshelf);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling_lamp1);				//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling_lamp2);				//
+	LoadTGATextureSimple("objects/textures/tga/chair_seat_&_back.tga", &t_chair_back);
+	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_chair_legs);
+	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_chair_lower_part);
+	LoadTGATextureSimple("objects/textures/tga/chair_seat_&_back.tga", &t_chair_seat);
+	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_chair_wheels);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk);						//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_cap);					//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_handle);				//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_lamp);					//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_desk_lamp_holder);			//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door);						//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_frame);				//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_handle);				//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_door_keyhole);				//
+	LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling);					//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_walls);						//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_floor2);					// samma som floor ovan?
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_ceiling2);					//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_walls2);					//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_lamp_shade);			//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_lamp_stand);			//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_Hektar_light_bulb_stand);	//
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_TV);						// TV.tga funkar inte av någon anledning
+	LoadTGATextureSimple("objects/textures/tga/TV_granite.tga", &t_TV_granite);
+	LoadTGATextureSimple("objects/textures/tga/placeholder.tga", &t_TV_screen);					//
+	LoadTGATextureSimple("objects/textures/tga/TV_table.tga", &t_TV_table);
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_windows);
+	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_window_handle);
+
+	// Unused: lamp.tga, red.tga, TV.tga (funkar ej), Silver-Texture-Wallpapers-and-Backgrounds-1024x819
+	// --------
+
     // Laddning av modeller.
 
 	squareModel = LoadDataToModel(
@@ -290,11 +380,11 @@ void init(void)
 	m_bookshelf = Thing("objects/bookshelf.obj");
 	m_ceiling_lamp1 = Thing("objects/ceiling_lamp1.obj");
 	m_ceiling_lamp2 = Thing("objects/ceiling_lamp2.obj");
-	/*m_chair_back = Thing("objects/chair_back.obj");
+	m_chair_back = Thing("objects/chair_back.obj");
 	m_chair_legs = Thing("objects/chair_legs.obj");
 	m_chair_lower_part = Thing("objects/chair_lower_part.obj");
 	m_chair_seat = Thing("objects/chair_seat.obj");
-	m_chair_wheels = Thing("objects/chair_wheels.obj");*/
+	m_chair_wheels = Thing("objects/chair_wheels.obj");
 	m_desk = Thing("objects/desk.obj");
 	m_desk_cap = Thing("objects/desk_cap.obj");
 	m_desk_handle = Thing("objects/desk_handle.obj");
@@ -305,8 +395,11 @@ void init(void)
 	m_door_handle = Thing("objects/door_handle.obj");
 	m_door_keyhole = Thing("objects/door_keyhole.obj");
 	m_floor = Thing("objects/floor.obj");
-	m_walls = Thing("objects/walls.obj");
 	m_ceiling = Thing("objects/ceiling.obj");
+	m_walls = Thing("objects/walls.obj");
+	m_floor2 = Thing("objects/floor2.obj");
+	m_ceiling2 = Thing("objects/ceiling2.obj");
+	m_walls2 = Thing("objects/walls2.obj");
 	m_Hektar_lamp_shade = Thing("objects/Hektar_lamp_shade.obj");
 	m_Hektar_lamp_stand = Thing("objects/Hektar_lamp_stand.obj");
 	m_Hektar_light_bulb_stand = Thing("objects/Hektar_light_bulb_stand.obj");
@@ -316,18 +409,10 @@ void init(void)
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
-	m_ceiling2 = Thing("objects/ceiling2.obj");
-	m_walls2 = Thing("objects/walls2.obj");
-	m_floor2 = Thing("objects/floor2.obj");
 	// -----------------------
 
+
     // Initiell placering och skalning av modeller.
-	m_ceiling2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_ceiling2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling2.MTWmatrix;
-	m_walls2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_walls2.MTWmatrix = glm::translate(sceneTrans) * m_walls2.MTWmatrix;
-	m_floor2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_floor2.MTWmatrix = glm::translate(sceneTrans) * m_floor2.MTWmatrix;
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_bedside_lamp_lightbulb.MTWmatrix = glm::translate(sceneTrans) * m_bedside_lamp_lightbulb.MTWmatrix;
 	m_bedside_lamp_lightbulb2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -402,7 +487,7 @@ void init(void)
 	m_ceiling_lamp1.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_lamp1.MTWmatrix;
 	m_ceiling_lamp2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_ceiling_lamp2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling_lamp2.MTWmatrix;
-	/*m_chair_back.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_chair_back.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_chair_back.MTWmatrix = glm::translate(sceneTrans) * m_chair_back.MTWmatrix;
 	m_chair_legs.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_chair_legs.MTWmatrix = glm::translate(sceneTrans) * m_chair_legs.MTWmatrix;
@@ -411,7 +496,7 @@ void init(void)
 	m_chair_seat.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_chair_seat.MTWmatrix = glm::translate(sceneTrans) * m_chair_seat.MTWmatrix;
 	m_chair_wheels.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_chair_wheels.MTWmatrix = glm::translate(sceneTrans) * m_chair_wheels.MTWmatrix;*/
+	m_chair_wheels.MTWmatrix = glm::translate(sceneTrans) * m_chair_wheels.MTWmatrix;
 	m_desk.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_desk.MTWmatrix = glm::translate(sceneTrans) * m_desk.MTWmatrix;
 	m_desk_cap.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -435,16 +520,22 @@ void init(void)
 	m_door_keyhole.MTWmatrix = glm::translate(doorTrans) * m_door_keyhole.MTWmatrix;
 	m_floor.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_floor.MTWmatrix = glm::translate(sceneTrans) * m_floor.MTWmatrix;
+	m_ceiling.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling.MTWmatrix = glm::translate(sceneTrans) * m_ceiling.MTWmatrix;
+	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_walls.MTWmatrix = glm::translate(sceneTrans) * m_walls.MTWmatrix;
+	m_floor2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_floor2.MTWmatrix = glm::translate(sceneTrans) * m_floor2.MTWmatrix;
+	m_ceiling2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_ceiling2.MTWmatrix = glm::translate(sceneTrans) * m_ceiling2.MTWmatrix;
+	m_walls2.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_walls2.MTWmatrix = glm::translate(sceneTrans) * m_walls2.MTWmatrix;
 	m_Hektar_lamp_shade.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_Hektar_lamp_shade.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_shade.MTWmatrix;
 	m_Hektar_light_bulb_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_Hektar_light_bulb_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_light_bulb_stand.MTWmatrix;
 	m_Hektar_lamp_stand.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_Hektar_lamp_stand.MTWmatrix = glm::translate(sceneTrans) * m_Hektar_lamp_stand.MTWmatrix;
-	m_walls.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_walls.MTWmatrix = glm::translate(sceneTrans) * m_walls.MTWmatrix;
-	m_ceiling.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
-	m_ceiling.MTWmatrix = glm::translate(sceneTrans) * m_ceiling.MTWmatrix;
 	m_TV.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_TV.MTWmatrix = glm::translate(sceneTrans) * m_TV.MTWmatrix;
 	m_TV_granite.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -458,6 +549,69 @@ void init(void)
 	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
 
+	// Texturlista
+	texlist.push_back(t_bedside_lamp_lightbulb);
+	texlist.push_back(t_bedside_lamp_lightbulb2);
+	texlist.push_back(t_desk_lamp_lightbulb);
+	texlist.push_back(t_Hektar_light_bulb);
+	texlist.push_back(t_ceiling_bulb1);
+	texlist.push_back(t_ceiling_bulb2);
+
+	texlist.push_back(t_bed);
+	texlist.push_back(t_bedside_table);
+	texlist.push_back(t_bedside_table_handle);
+	texlist.push_back(t_bedside_table_doors);
+	texlist.push_back(t_bedside_lamp);
+	texlist.push_back(t_bedside_lamp_shade);
+	texlist.push_back(t_bedside_table2);
+	texlist.push_back(t_bedside_table_handle2);
+	texlist.push_back(t_bedside_table_doors2);
+	texlist.push_back(t_bedside_lamp2);
+	texlist.push_back(t_bedside_lamp_shade2);
+	texlist.push_back(t_bamboo1);
+	texlist.push_back(t_bamboo2);
+	texlist.push_back(t_bamboo3);
+	texlist.push_back(t_bamboo4);
+	texlist.push_back(t_bamboo5);
+	texlist.push_back(t_bamboo6);
+	texlist.push_back(t_bamboo_leaf);
+	texlist.push_back(t_flower_pot);
+	texlist.push_back(t_earth);
+	texlist.push_back(t_mattress);
+	texlist.push_back(t_sheet_pillow);
+	texlist.push_back(t_books);
+	texlist.push_back(t_bookshelf);
+	texlist.push_back(t_ceiling_lamp1);
+	texlist.push_back(t_ceiling_lamp2);
+	texlist.push_back(t_chair_back);
+	texlist.push_back(t_chair_legs);
+	texlist.push_back(t_chair_lower_part);
+	texlist.push_back(t_chair_seat);
+	texlist.push_back(t_chair_wheels);
+	texlist.push_back(t_desk);
+	texlist.push_back(t_desk_cap);
+	texlist.push_back(t_desk_handle);
+	texlist.push_back(t_desk_lamp);
+	texlist.push_back(t_desk_lamp_holder);
+	texlist.push_back(t_door);
+	texlist.push_back(t_door_frame);
+	texlist.push_back(t_door_handle);
+	texlist.push_back(t_door_keyhole);
+	texlist.push_back(t_floor);
+	texlist.push_back(t_ceiling);
+	texlist.push_back(t_walls);
+	texlist.push_back(t_floor2);
+	texlist.push_back(t_ceiling2);
+	texlist.push_back(t_walls2);
+	texlist.push_back(t_Hektar_lamp_shade);
+	texlist.push_back(t_Hektar_light_bulb_stand);
+	texlist.push_back(t_Hektar_lamp_stand);
+	texlist.push_back(t_TV);
+	texlist.push_back(t_TV_granite);
+	texlist.push_back(t_TV_screen);
+	texlist.push_back(t_TV_table);
+	texlist.push_back(t_window_handle);
+	texlist.push_back(t_windows);
 
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
 	objlist.push_back(m_bedside_lamp_lightbulb);
@@ -466,10 +620,6 @@ void init(void)
 	objlist.push_back(m_Hektar_light_bulb);
 	objlist.push_back(m_ceiling_bulb1);
 	objlist.push_back(m_ceiling_bulb2);
-	objlist.push_back(m_ceiling2);
-	objlist.push_back(m_walls2);
-	objlist.push_back(m_floor2);
-
 
 	objlist.push_back(m_bed);
 	objlist.push_back(m_bedside_table);
@@ -497,11 +647,11 @@ void init(void)
 	objlist.push_back(m_bookshelf);
 	objlist.push_back(m_ceiling_lamp1);
 	objlist.push_back(m_ceiling_lamp2);
-	/*objlist.push_back(m_chair_back);
+	objlist.push_back(m_chair_back);
 	objlist.push_back(m_chair_legs);
 	objlist.push_back(m_chair_lower_part);
 	objlist.push_back(m_chair_seat);
-	objlist.push_back(m_chair_wheels);*/
+	objlist.push_back(m_chair_wheels);
 	objlist.push_back(m_desk);
 	objlist.push_back(m_desk_cap);
 	objlist.push_back(m_desk_handle);
@@ -513,8 +663,11 @@ void init(void)
 	objlist.push_back(m_door_handle);
 	objlist.push_back(m_door_keyhole);
 	objlist.push_back(m_floor);
-	objlist.push_back(m_walls);
 	objlist.push_back(m_ceiling);
+	objlist.push_back(m_walls);
+	objlist.push_back(m_floor2);
+	objlist.push_back(m_ceiling2);
+	objlist.push_back(m_walls2);
 	objlist.push_back(m_Hektar_lamp_shade);
 	objlist.push_back(m_Hektar_light_bulb_stand);
 	objlist.push_back(m_Hektar_lamp_stand);
@@ -773,20 +926,16 @@ void draw_scene(lightSource light)
 
 	glUseProgram(shadowphongshader);
 	useFBO(tmp_fbo, z_fbo, 0L);
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUniformMatrix4fv(glGetUniformLocation(shadowphongshader, "VTPMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(shadowphongshader, "WTVMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3fv(glGetUniformLocation(shadowphongshader, "lPos"), 1, glm::value_ptr(light.pos));
 	glUniform1f(glGetUniformLocation(shadowphongshader, "bias"), bias);
 
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	// ---------------- Scenen renderas till tmp_fbo ----------------
 	glUniform1i(glGetUniformLocation(shadowphongshader, "texUnit"), 0);
-	GLfloat camPos[3] = { cam.position.x, cam.position.y, cam.position.z };
-	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, camPos);
+	glUniform3fv(glGetUniformLocation(shadowphongshader, "camPos"), 1, glm::value_ptr(cam.position));
 	draw_order(light, textureMatrix);
 	// --------------------------------------------------------------
 
@@ -809,7 +958,7 @@ void draw_order(lightSource light, glm::mat4 textureMatrix)
 {
 	for (int n = 0; n < objlist.size(); n++)
 	{
-		objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix);
+		objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
 	}
 }
 
