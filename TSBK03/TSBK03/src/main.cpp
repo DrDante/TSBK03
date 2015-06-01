@@ -76,7 +76,8 @@ Thing m_bedside_table2, m_bedside_table_handle2, m_bedside_table_doors2;			// Be
 Thing m_books, m_bookshelf;															// Bookshelf, etc.
 Thing m_ceiling_lamp1, m_ceiling_lamp2;												// Taklampor.
 Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
-Thing m_desk, m_desk_cap, m_desk_handle, m_desk_lamp, m_desk_lamp_holder;			// Desk, etc.
+Thing m_desk, m_desk_cap, m_desk_cap_ring, m_desk_handle;							// Desk, etc.
+Thing m_desk_lamp, m_desk_lamp_holder;												// Desk lamp
 Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
 Thing m_floor, m_ceiling, m_walls;													// Golv, väggar.
 Thing m_floor2, m_ceiling2, m_walls2;												// Rum 2.
@@ -100,7 +101,7 @@ GLuint t_bedside_table2, t_bedside_table_handle2, t_bedside_table_doors2;
 GLuint t_books, t_bookshelf;
 GLuint t_ceiling_lamp1, t_ceiling_lamp2;
 GLuint t_chair_back, t_chair_legs, t_chair_lower_part, t_chair_seat, t_chair_wheels;
-GLuint t_desk, t_desk_cap, t_desk_handle, t_desk_lamp, t_desk_lamp_holder;
+GLuint t_desk, t_desk_cap, t_desk_cap_ring, t_desk_handle, t_desk_lamp, t_desk_lamp_holder;
 GLuint t_door, t_door_frame, t_door_handle, t_door_keyhole;
 GLuint t_floor, t_ceiling, t_walls;
 GLuint t_floor2, t_ceiling2, t_walls2;
@@ -306,7 +307,8 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/chair_seat_&_back.tga", &t_chair_seat);
 	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_chair_wheels);
 	LoadTGATextureSimple("objects/textures/tga/desk.tga", &t_desk);						//
-	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_desk_cap);					//
+	LoadTGATextureSimple("objects/textures/tga/brown.tga", &t_desk_cap);					//
+	LoadTGATextureSimple("objects/textures/tga/brown.tga", &t_desk_cap_ring);			// ------------------------------------------------
 	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_desk_handle);				//
 	LoadTGATextureSimple("objects/textures/tga/DarkRed.tga", &t_desk_lamp);					//
 	LoadTGATextureSimple("objects/textures/tga/DarkRed.tga", &t_desk_lamp_holder);			//
@@ -392,6 +394,7 @@ void init(void)
 	m_chair_wheels = Thing("objects/chair_wheels.obj");
 	m_desk = Thing("objects/desk.obj");
 	m_desk_cap = Thing("objects/desk_cap.obj");
+	m_desk_cap_ring = Thing("objects/desk_cap_ring.obj");
 	m_desk_handle = Thing("objects/desk_handle.obj");
 	m_desk_lamp = Thing("objects/lamp.obj");
 	m_desk_lamp_holder = Thing("objects/lamp_holder.obj");
@@ -508,6 +511,8 @@ void init(void)
 	m_desk.MTWmatrix = glm::translate(sceneTrans) * m_desk.MTWmatrix;
 	m_desk_cap.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_desk_cap.MTWmatrix = glm::translate(sceneTrans) * m_desk_cap.MTWmatrix;
+	m_desk_cap_ring.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_desk_cap_ring.MTWmatrix = glm::translate(sceneTrans) * m_desk_cap_ring.MTWmatrix;
 	m_desk_handle.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_desk_handle.MTWmatrix = glm::translate(sceneTrans) * m_desk_handle.MTWmatrix;
 	m_desk_lamp.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -601,6 +606,7 @@ void init(void)
 	texlist.push_back(t_chair_wheels);
 	texlist.push_back(t_desk);
 	texlist.push_back(t_desk_cap);
+	texlist.push_back(t_desk_cap_ring);
 	texlist.push_back(t_desk_handle);
 	texlist.push_back(t_desk_lamp);
 	texlist.push_back(t_desk_lamp_holder);
@@ -667,6 +673,7 @@ void init(void)
 	objlist.push_back(m_chair_wheels);
 	objlist.push_back(m_desk);
 	objlist.push_back(m_desk_cap);
+	objlist.push_back(m_desk_cap_ring);
 	objlist.push_back(m_desk_handle);
 	objlist.push_back(m_desk_lamp);
 	objlist.push_back(m_desk_lamp_holder);
