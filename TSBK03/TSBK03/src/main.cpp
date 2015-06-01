@@ -342,8 +342,8 @@ void init(void)
     // Laddning av modeller.
 
     squareModel = LoadDataToModel(
-	    square, NULL, squareTexCoord, NULL,
-	    squareIndices, 4, 6);
+            square, NULL, squareTexCoord, NULL,
+            squareIndices, 4, 6);
 
     lightsrc = Thing("objects/sphere.obj");
     // --- Julius modeller ---
@@ -760,100 +760,100 @@ void display(void)
 
     if (isDoorRotating)
     {
-	RotateDoor();
+        RotateDoor();
     }
 
     // Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo
     if (draw1)
     {
-	draw_scene(sunlight);
+        draw_scene(sunlight);
     }
     if (draw2)
     {
-	draw_scene(bedlight1);
-	draw_scene(bedlight2);
+        draw_scene(bedlight1);
+        draw_scene(bedlight2);
     }
     if (draw3)
     {
-	draw_scene(bedlight21);
-	draw_scene(bedlight22);
+        draw_scene(bedlight21);
+        draw_scene(bedlight22);
     }
     if (draw4)
     {
-	draw_scene(desklamp);
+        draw_scene(desklamp);
     }
     if (draw5)
     {
-	draw_scene(hektarlight);
+        draw_scene(hektarlight);
     }
     if (draw6)
     {
-	draw_scene(ceillight11);
-	draw_scene(ceillight12);
-	draw_scene(ceillight13);
+        draw_scene(ceillight11);
+        draw_scene(ceillight12);
+        draw_scene(ceillight13);
     }
     if (draw7)
     {
-	draw_scene(ceillight21);
+        draw_scene(ceillight21);
     }
     if (draw8)
     {
-	draw_scene(ceillight22);
+        draw_scene(ceillight22);
     }
     if (draw9)
     {
-	draw_scene(ceillight23);
+        draw_scene(ceillight23);
     }
     if (drawf)
     {
-	flashlight.pos = cam.position;
-	flashlight.look_at = cam.look_at_pos;
-	draw_scene(flashlight);
+        flashlight.pos = cam.position;
+        flashlight.look_at = cam.look_at_pos;
+        draw_scene(flashlight);
     }
 
     // Rita ut ljuskällor till res_fbo
     if (debugmode)
     {
-	if (draw1)
-	{
-	    draw_lights(sunlight);
-	}
-	if (draw2)
-	{
-	    draw_lights(bedlight1);
-	    draw_lights(bedlight2);
-	}
-	if (draw3)
-	{
-	    draw_lights(bedlight1);
-	    draw_lights(bedlight2);
-	}
-	if (draw4)
-	{
-	    draw_lights(desklamp);
-	}
-	if (draw5)
-	{
-	    draw_lights(hektarlight);
-	}
-	if (draw6)
-	{
-	    draw_lights(ceillight11);
-	    draw_lights(ceillight12);
-	    draw_lights(ceillight13);
-	}
-	if (draw7)
-	{
-	    draw_lights(ceillight21);
-	}
-	if (draw8)
-	{
-	    draw_lights(ceillight22);
-	}
-	if (draw9)
-	{
-	    draw_lights(ceillight23);
-	}
+        if (draw1)
+        {
+            draw_lights(sunlight);
+        }
+        if (draw2)
+        {
+            draw_lights(bedlight1);
+            draw_lights(bedlight2);
+        }
+        if (draw3)
+        {
+            draw_lights(bedlight1);
+            draw_lights(bedlight2);
+        }
+        if (draw4)
+        {
+            draw_lights(desklamp);
+        }
+        if (draw5)
+        {
+            draw_lights(hektarlight);
+        }
+        if (draw6)
+        {
+            draw_lights(ceillight11);
+            draw_lights(ceillight12);
+            draw_lights(ceillight13);
+        }
+        if (draw7)
+        {
+            draw_lights(ceillight21);
+        }
+        if (draw8)
+        {
+            draw_lights(ceillight22);
+        }
+        if (draw9)
+        {
+            draw_lights(ceillight23);
+        }
     }
 
     // Rita ut res_fbo till skärmen	
@@ -985,16 +985,16 @@ void draw_order(lightSource light, glm::mat4 textureMatrix)
 {
     for (unsigned int n = 0; n < objlist.size(); n++)
     {
-	if (n == leafObjPos)
-	{
-	    glDisable(GL_CULL_FACE);
-	    objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
-	    glEnable(GL_CULL_FACE);
-	}
-	else
-	{
-	    objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
-	}
+        if (n == leafObjPos)
+        {
+            glDisable(GL_CULL_FACE);
+            objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+        }
     }
 }
 
