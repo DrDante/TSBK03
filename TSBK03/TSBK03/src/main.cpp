@@ -320,7 +320,7 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/door_frame.tga", &t_door_frame);
     LoadTGATextureSimple("objects/textures/tga/door_handle.tga", &t_door_handle);
     LoadTGATextureSimple("objects/textures/tga/door_keyhole.tga", &t_door_keyhole);
-    LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);									//
+    LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);
     LoadTGATextureSimple("objects/textures/tga/ceiling.tga", &t_ceiling);
     LoadTGATextureSimple("objects/textures/tga/walls.tga", &t_walls);									//
     LoadTGATextureSimple("objects/textures/tga/floor2.tga", &t_floor2);
