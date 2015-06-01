@@ -29,8 +29,8 @@ class Camera {
         Camera(int program, glm::mat4 *matrix);
         Camera();
 
-        glm::vec3 position{0,5,15};
-        glm::vec3 look_at_pos{0,0,0};
+		glm::vec3 position{ 23.5 * 6, 2.5 * 6, 28 * 6 };
+		glm::vec3 look_at_pos{ 23.5 * 6, 2.5 * 6, 28 * 5 };
         glm::vec3 up{0,1,0};
 
         glm::mat4 *matrix;

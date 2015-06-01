@@ -62,30 +62,30 @@ GLenum err;
 
 // ---------------------------Globals---------------------------
 // Saker
-unsigned int lightbulbs = 6;																	// Antalet glödlampor (samma som ovan)
+unsigned int lightbulbs = 6;																			// Antalet glödlampor (samma som ovan)
 
-Thing lightsrc;																		// Ljuskälla (debug endast)
-Thing m_bedside_lamp_lightbulb, m_bedside_lamp_lightbulb2;							// Glödlampor.
+Thing lightsrc;																							// Ljuskälla (debug endast)
+Thing m_bedside_lamp_lightbulb, m_bedside_lamp_lightbulb2;												// Glödlampor.
 Thing m_desk_lamp_lightbulb, m_Hektar_light_bulb, m_ceiling_lamp_lightbulb1, m_ceiling_lamp_lightbulb2;	// Glödlampor.
-Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;				// Bamboo, etc.
-Thing m_bamboo_leaf, m_earth, m_flower_pot;											// Bamboo, etc.
-Thing m_bed, m_mattress, m_sheet_pillow;											// Bed, etc.
-Thing m_bedside_lamp, m_bedside_lamp_shade;											// Bedside table 1 lamp.
-Thing m_bedside_table, m_bedside_table_handle, m_bedside_table_doors;				// Bedside table 1, etc.
-Thing m_bedside_lamp2, m_bedside_lamp_shade2;										// Bedside table 2 lamp.
-Thing m_bedside_table2, m_bedside_table_handle2, m_bedside_table_doors2;			// Bedside table 2, etc.
-Thing m_books, m_bookshelf;															// Bookshelf, etc.
-Thing m_ceiling_lamp1, m_ceiling_lamp2;												// Taklampor.
-Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
-Thing m_desk, m_desk_cap, m_desk_cap_ring, m_desk_handle;							// Desk, etc.
-Thing m_desk_lamp, m_desk_lamp_bulb_holder, m_desk_lamp_shade;						// Desk lamp.
-Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
-Thing m_floor, m_ceiling, m_walls;													// Golv, väggar.
-Thing m_floor2, m_ceiling2, m_walls2;												// Rum 2.
-Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
-Thing m_window_handle, m_windows;													// Windows.
-Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
-Thing m_laptop, m_laptop_screen;													// Laptop
+Thing m_bamboo1, m_bamboo2, m_bamboo3, m_bamboo4, m_bamboo5, m_bamboo6;									// Bamboo, etc.
+Thing m_bamboo_leaf, m_earth, m_flower_pot;																// Bamboo, etc.
+Thing m_bed, m_mattress, m_sheet_pillow;																// Bed, etc.
+Thing m_bedside_lamp, m_bedside_lamp_shade;																// Bedside table 1 lamp.
+Thing m_bedside_table, m_bedside_table_handle, m_bedside_table_doors;									// Bedside table 1, etc.
+Thing m_bedside_lamp2, m_bedside_lamp_shade2;															// Bedside table 2 lamp.
+Thing m_bedside_table2, m_bedside_table_handle2, m_bedside_table_doors2;								// Bedside table 2, etc.
+Thing m_books, m_bookshelf;																				// Bookshelf, etc.
+Thing m_ceiling_lamp1, m_ceiling_lamp2;																	// Taklampor.
+Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;						// Chair. (LOTS OF POLYGONS)
+Thing m_desk, m_desk_cap, m_desk_cap_ring, m_desk_handle;												// Desk, etc.
+Thing m_desk_lamp, m_desk_lamp_bulb_holder, m_desk_lamp_shade;											// Desk lamp.
+Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;												// Door.
+Thing m_floor, m_ceiling, m_walls;																		// Golv, väggar.
+Thing m_floor2, m_ceiling2, m_walls2;																	// Rum 2.
+Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;														// TV, etc.
+Thing m_window_handle, m_windows;																		// Windows.
+Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;								// Hektar Ikea lampa.
+Thing m_laptop, m_laptop_screen;																		// Laptop
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -112,9 +112,6 @@ GLuint t_window_handle, t_windows;
 GLuint t_Hektar_lamp_shade, t_Hektar_lamp_stand, t_Hektar_light_bulb_stand;
 GLuint t_laptop, t_laptop_screen;
 std::vector<GLuint> texlist;
-
-// Model
-Model *wallModel;
 
 //---
 GLfloat square[] = {
@@ -143,16 +140,13 @@ glm::mat4 scaleBiasMatrix;
 FBOstruct *z_fbo, *tmp_fbo, *res_fbo;
 
 // Shaders.
-GLuint shadowphongshader = 0, zshader = 0, addshader = 0, plainshader = 0; // passthrough shader;
+GLuint shadowphongshader = 0, zshader = 0, addshader = 0, plainshader = 0;
 // Skärmstorlek
 int width = 1024;
 int height = 768;
-// Övrigt.
 
 // Bias som används för att undvika skuggacne, används i shadowphong.frag
 float bias = 0.0001;
-
-//GLfloat t = 0;	// Tidsvariabel.
 
 // --------------------Ljuskälla-----------------------------
 class lightSource 
@@ -290,14 +284,14 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp2.tga", &t_bedside_lamp2);
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade2.tga", &t_bedside_lamp_shade2);
     LoadTGATextureSimple("objects/textures/tga/mattress.tga", &t_mattress);
-    LoadTGATextureSimple("objects/textures/tga/sheet_pillow.tga", &t_sheet_pillow);						//
+    LoadTGATextureSimple("objects/textures/tga/sheet_pillow.tga", &t_sheet_pillow);
     LoadTGATextureSimple("objects/textures/tga/bamboo1.tga", &t_bamboo1);
     LoadTGATextureSimple("objects/textures/tga/bamboo2.tga", &t_bamboo2);
     LoadTGATextureSimple("objects/textures/tga/bamboo3.tga", &t_bamboo3);
     LoadTGATextureSimple("objects/textures/tga/bamboo4.tga", &t_bamboo4);
     LoadTGATextureSimple("objects/textures/tga/bamboo5.tga", &t_bamboo5);
     LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);
-    LoadTGATextureSimple("objects/textures/tga/bamboo_leaf.tga", &t_bamboo_leaf);						//
+    LoadTGATextureSimple("objects/textures/tga/bamboo_leaf.tga", &t_bamboo_leaf);
     LoadTGATextureSimple("objects/textures/tga/flower_pot.tga", &t_flower_pot);
     LoadTGATextureSimple("objects/textures/tga/earth.tga", &t_earth);
     LoadTGATextureSimple("objects/textures/tga/books.tga", &t_books);
@@ -305,10 +299,10 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);
     LoadTGATextureSimple("objects/textures/tga/ceiling_lamp2.tga", &t_ceiling_lamp2);
     LoadTGATextureSimple("objects/textures/tga/chair_back.tga", &t_chair_back);
-    //LoadTGATextureSimple("objects/textures/tga/chair_legs.tga", &t_chair_legs);
+    LoadTGATextureSimple("objects/textures/tga/chair_legs.tga", &t_chair_legs);
     LoadTGATextureSimple("objects/textures/tga/chair_lower_part.tga", &t_chair_lower_part);
     LoadTGATextureSimple("objects/textures/tga/chair_seat.tga", &t_chair_seat);
-    //LoadTGATextureSimple("objects/textures/tga/chair_wheels.tga", &t_chair_wheels);
+    LoadTGATextureSimple("objects/textures/tga/chair_wheels.tga", &t_chair_wheels);
     LoadTGATextureSimple("objects/textures/tga/desk.tga", &t_desk);
     LoadTGATextureSimple("objects/textures/tga/desk_cap.tga", &t_desk_cap);
     LoadTGATextureSimple("objects/textures/tga/desk_cap_ring.tga", &t_desk_cap_ring);
@@ -389,10 +383,10 @@ void init(void)
     m_ceiling_lamp1 = Thing("objects/ceiling_lamp.obj");
     m_ceiling_lamp2 = Thing("objects/ceiling_lamp2.obj");
     m_chair_back = Thing("objects/chair_back.obj");
-    //m_chair_legs = Thing("objects/chair_legs.obj");
+    m_chair_legs = Thing("objects/chair_legs.obj");
     m_chair_lower_part = Thing("objects/chair_lower_part.obj");
     m_chair_seat = Thing("objects/chair_seat.obj");
-    //m_chair_wheels = Thing("objects/chair_wheels.obj");
+    m_chair_wheels = Thing("objects/chair_wheels.obj");
     m_desk = Thing("objects/desk.obj");
     m_desk_cap = Thing("objects/desk_cap.obj");
     m_desk_cap_ring = Thing("objects/desk_cap_ring.obj");
@@ -400,7 +394,6 @@ void init(void)
     m_desk_lamp = Thing("objects/desk_lamp.obj");
     m_desk_lamp_bulb_holder = Thing("objects/desk_lamp_bulb_holder.obj");
     m_desk_lamp_shade = Thing("objects/desk_lamp_shade.obj");
-    //m_desk_lamp_holder = Thing("objects/desk_lamp_holder.obj");
     m_door = Thing("objects/door.obj");
     m_door_frame = Thing("objects/door_frame.obj");
     m_door_handle = Thing("objects/door_handle.obj");
@@ -481,13 +474,10 @@ void init(void)
     m_bamboo6.MTWmatrix = glm::translate(bambooTrans) * m_bamboo6.MTWmatrix;
     m_bamboo_leaf.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
     m_bamboo_leaf.MTWmatrix = glm::translate(sceneTrans) * m_bamboo_leaf.MTWmatrix;
-    m_bamboo_leaf.MTWmatrix = glm::translate(bambooTrans) * m_bamboo_leaf.MTWmatrix;
     m_flower_pot.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
     m_flower_pot.MTWmatrix = glm::translate(sceneTrans) * m_flower_pot.MTWmatrix;
-    //m_flower_pot.MTWmatrix = glm::translate(bambooTrans) * m_flower_pot.MTWmatrix;
     m_earth.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
     m_earth.MTWmatrix = glm::translate(sceneTrans) * m_earth.MTWmatrix;
-    //m_earth.MTWmatrix = glm::translate(bambooTrans) * m_earth.MTWmatrix;
     m_mattress.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
     m_mattress.MTWmatrix = glm::translate(sceneTrans) * m_mattress.MTWmatrix;
     m_sheet_pillow.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -605,10 +595,10 @@ void init(void)
     texlist.push_back(t_ceiling_lamp1);
     texlist.push_back(t_ceiling_lamp2);
     texlist.push_back(t_chair_back);
-    //texlist.push_back(t_chair_legs);
+    texlist.push_back(t_chair_legs);
     texlist.push_back(t_chair_lower_part);
     texlist.push_back(t_chair_seat);
-    //texlist.push_back(t_chair_wheels);
+    texlist.push_back(t_chair_wheels);
     texlist.push_back(t_desk);
     texlist.push_back(t_desk_cap);
     texlist.push_back(t_desk_cap_ring);
@@ -674,10 +664,10 @@ void init(void)
     objlist.push_back(m_ceiling_lamp1);
     objlist.push_back(m_ceiling_lamp2);
     objlist.push_back(m_chair_back);
-    //objlist.push_back(m_chair_legs);
+    objlist.push_back(m_chair_legs);
     objlist.push_back(m_chair_lower_part);
     objlist.push_back(m_chair_seat);
-    //objlist.push_back(m_chair_wheels);
+    objlist.push_back(m_chair_wheels);
     objlist.push_back(m_desk);
     objlist.push_back(m_desk_cap);
     objlist.push_back(m_desk_cap_ring);
@@ -741,11 +731,6 @@ void init(void)
 
 void display(void)
 {
-    // TODO
-    // * Ordna objektberoende phongparametrar
-    // * Lägg på bloom (och kanske motion blur?)
-    // * Putsa
-
     // Rensa framebuffers & z-buffer.
     glClearColor(0.0, 0.0, 0.0, 0);
     useFBO(res_fbo, 0L, 0L);
@@ -754,16 +739,13 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     useFBO(z_fbo, 0L, 0L);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Öka tidsvariabeln t.
-    //t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-
+	
     if (isDoorRotating)
     {
         RotateDoor();
     }
 
-    // Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo
+    // Rita ut scenen till z-buffern, sedan med phong till tmp_fbo, och addera till res_fbo.
     if (draw1)
     {
         draw_scene(sunlight);
@@ -811,7 +793,7 @@ void display(void)
         draw_scene(flashlight);
     }
 
-    // Rita ut ljuskällor till res_fbo
+    // Rita ut ljuskällor till res_fbo.
     if (debugmode)
     {
         if (draw1)
@@ -856,7 +838,7 @@ void display(void)
         }
     }
 
-    // Rita ut res_fbo till skärmen	
+    // Rita ut res_fbo till skärmen.
     glUseProgram(plainshader);
     useFBO(0L, res_fbo, 0L);
     DrawModel(squareModel, plainshader, "in_Position", NULL, "in_TexCoord");
@@ -907,7 +889,7 @@ void RotateDoor()
 
 void fbo_add_tmp_to_res()
 {
-    // Adds two fbos (tmp_fbo and res_fbo) to res_fbo
+    // Adds two fbos (tmp_fbo and res_fbo) to res_fbo.
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glUseProgram(addshader);
@@ -923,12 +905,12 @@ void draw_scene(lightSource light)
     useFBO(z_fbo, 0L, 0L);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Aktivera z-buffering
+    // Aktivera z-buffering.
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // Flytta kamera till ljuskällan
+    // Flytta kamera till ljuskällan.
     glm::vec3 tmp_cam_pos = cam.position;
     glm::vec3 tmp_cam_look_at = cam.look_at_pos;
 
@@ -946,7 +928,7 @@ void draw_scene(lightSource light)
 
     glm::mat4 textureMatrix = scaleBiasMatrix * projectionMatrix * viewMatrix;
 
-    // Återställ kameran till ursprungsposition
+    // Återställ kameran till ursprungsposition.
     cam.position = tmp_cam_pos;
     cam.look_at_pos = tmp_cam_look_at;
     cam.update();
@@ -966,7 +948,7 @@ void draw_scene(lightSource light)
     draw_order(light, textureMatrix);
     // --------------------------------------------------------------
 
-    // Scenen adderas till res_fbo
+    // Scenen adderas till res_fbo.
     fbo_add_tmp_to_res();
 }
 
@@ -1000,7 +982,7 @@ void draw_order(lightSource light, glm::mat4 textureMatrix)
 
 void draw_lights(lightSource light)
 {
-    // Rita ut ljuskällor
+    // Rita ut ljuskällor.
     glUseProgram(shadowphongshader);
     useFBO(tmp_fbo, 0L, 0L);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1011,11 +993,11 @@ void draw_lights(lightSource light)
     lightsrc.MTWmatrix = glm::translate(light.pos);
     lightsrc.draw(shadowphongshader);
 
-    // Addera till res_fbo
+    // Addera till res_fbo.
     fbo_add_tmp_to_res();
 }
 
-// Timer för uppritande av skärm. Man får inte kalla funktioner här inne
+// Timer för uppritande av skärm. Man får inte kalla funktioner här inne.
 Uint32 display_timer(Uint32 interval, void* param)
 {
     SDL_Event event;
@@ -1042,7 +1024,7 @@ Uint32 update_timer(Uint32 interval, void* param)
     return interval;
 }
 
-// Hantera event
+// Hantera event.
 void event_handler(SDL_Event event)
 {
     switch(event.type){
@@ -1072,7 +1054,7 @@ void event_handler(SDL_Event event)
     }
 }
 
-// Hantera avändardefinierade event
+// Hantera avändardefinierade event.
 void handle_userevent(SDL_Event event)
 {
     switch(event.user.code){
@@ -1087,7 +1069,7 @@ void handle_userevent(SDL_Event event)
     }
 }
 
-// Hantera knapptryckningar
+// Hantera knapptryckningar.
 void handle_keypress(SDL_Event event)
 {
     switch(event.key.keysym.sym){
@@ -1166,20 +1148,20 @@ void handle_keypress(SDL_Event event)
         case SDLK_KP_MINUS:
             sunlight.move(glm::vec3(0, -1, 0));
             break;
-            // Print camera position for debugging
+            // Print camera position for debugging.
         case SDLK_p:
             std::cout << "Camera position: " << cam.position.x / scl << ", " << cam.position.y / scl << ", " << cam.position.z / scl << std::endl;
             break;
-            // Print spotlight positions for debugging
+            // Print spotlight positions for debugging.
         case SDLK_l:
             std::cout << "sunlight position: " << sunlight.pos.x / scl << ", " << sunlight.pos.y / scl << ", " << sunlight.pos.z / scl << std::endl;
             break;
-            // Öka bias
+            // Öka bias.
         case SDLK_b:
             bias += 0.0001;
             std::cout << bias << std::endl;
             break;
-            // Minska bias
+            // Minska bias.
         case SDLK_n:
             bias -= 0.0001;
             std::cout << bias << std::endl;
