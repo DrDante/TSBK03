@@ -83,6 +83,7 @@ Thing m_floor2, m_ceiling2, m_walls2;												// Rum 2.
 Thing m_TV, m_TV_granite, m_TV_screen, m_TV_table;									// TV, etc.
 Thing m_window_handle, m_windows;													// Windows.
 Thing m_Hektar_lamp_shade, m_Hektar_lamp_stand, m_Hektar_light_bulb_stand;			// Hektar Ikea lampa.
+Thing m_laptop, m_laptop_screen;													// Laptop
 float scl = 6;
 std::vector<Thing> objlist;
 
@@ -106,6 +107,7 @@ GLuint t_floor2, t_ceiling2, t_walls2;
 GLuint t_TV, t_TV_granite, t_TV_screen, t_TV_table;
 GLuint t_window_handle, t_windows;
 GLuint t_Hektar_lamp_shade, t_Hektar_lamp_stand, t_Hektar_light_bulb_stand;
+GLuint t_laptop, t_laptop_screen;
 std::vector<GLuint> texlist;
 
 // Model
@@ -327,6 +329,9 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/TV_table.tga", &t_TV_table);
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_windows);
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_window_handle);
+	LoadTGATextureSimple("objects/textures/tga/laptop.tga", &t_laptop);
+	LoadTGATextureSimple("objects/textures/tga/screen.tga", &t_laptop_screen);
+	
 
 	// Unused: lamp.tga, red.tga, TV.tga (funkar ej), Silver-Texture-Wallpapers-and-Backgrounds-1024x819
 	// --------
@@ -409,6 +414,8 @@ void init(void)
 	m_TV_table = Thing("objects/TV_table.obj");
 	m_window_handle = Thing("objects/window_handle.obj");
 	m_windows = Thing("objects/windows.obj");
+	m_laptop = Thing("objects/laptop.obj");
+	m_laptop_screen = Thing("objects/laptop_screen.obj");;
 	// -----------------------
 
 
@@ -548,6 +555,10 @@ void init(void)
 	m_window_handle.MTWmatrix = glm::translate(sceneTrans) * m_window_handle.MTWmatrix;
 	m_windows.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_windows.MTWmatrix = glm::translate(sceneTrans) * m_windows.MTWmatrix;
+	m_laptop.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_laptop.MTWmatrix = glm::translate(sceneTrans) * m_laptop.MTWmatrix;
+	m_laptop_screen.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
+	m_laptop_screen.MTWmatrix = glm::translate(sceneTrans) * m_laptop_screen.MTWmatrix;
 
 	// Texturlista
 	texlist.push_back(t_bedside_lamp_lightbulb);
@@ -612,6 +623,8 @@ void init(void)
 	texlist.push_back(t_TV_table);
 	texlist.push_back(t_window_handle);
 	texlist.push_back(t_windows);
+	texlist.push_back(t_laptop);
+	texlist.push_back(t_laptop_screen);
 
 	// Inladdning av modellerna i objlist. Kommentera ut rader nedan om något objekt ska exkluderas.
 	objlist.push_back(m_bedside_lamp_lightbulb);
@@ -677,6 +690,8 @@ void init(void)
 	objlist.push_back(m_TV_table);
 	objlist.push_back(m_window_handle);
 	objlist.push_back(m_windows);
+	objlist.push_back(m_laptop);
+	objlist.push_back(m_laptop_screen);
 
 
     // Scale and bias för shadow map
