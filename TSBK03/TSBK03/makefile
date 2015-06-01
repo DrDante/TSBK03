@@ -5,7 +5,7 @@ SRC = src
 CC = gcc
 CXX = g++
 
-WARNINGS = -Wall -Wextra -Wno-unused-parameter
+WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wno-write-strings
 
 CFLAGS = -g $(WARNINGS) -std=c99 -DGL_GLEXT_PROTOTYPES
 CXXFLAGS = -g $(WARNINGS) -std=c++0x -DGL_GLEXT_PROTOTYPES

@@ -76,12 +76,13 @@ void main(void)
 	float depth = 0;
 
 	// filter_side x filter_side filtrering för snyggare skuggor
-	int filter_side = 5;
+	int filter_side = 3;
 	for(int y = -(filter_side - 1)/2; y <= (filter_side - 1)/2; y++)
 	{
 		for(int x = -(filter_side - 1)/2; x <= (filter_side - 1)/2; x++)
 		{
 			float currTex = 0.0;
+			// Ignorera accesser som hamnar utanför texturen, får fula artefakter då
 			if(shadowCoord.x + x*pixelDiff.x > 0.0 && shadowCoord.y + y*pixelDiff.y > 0.0 && shadowCoord.x + x*pixelDiff.x < 1.0 && shadowCoord.y + y*pixelDiff.y < 1.0)
 			{
 				currTex = texture(texUnit, vec3(shadowCoord.x + x*pixelDiff.x, shadowCoord.y + y*pixelDiff.y, shadowCoord.z));
