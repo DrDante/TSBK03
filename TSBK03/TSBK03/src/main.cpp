@@ -359,7 +359,7 @@ void init(void)
     m_bedside_lamp_lightbulb2 = Thing("objects/light_bulb2.obj");
     m_desk_lamp_lightbulb = Thing("objects/desk_lamp_light_bulb.obj");
     m_Hektar_light_bulb = Thing("objects/Hektar_light_bulb.obj");
-    m_ceiling_lamp_lightbulb1 = Thing("objects/ceiling_lamp_lightbulbs1.obj");
+    m_ceiling_lamp_lightbulb1 = Thing("objects/ceiling_lamp_lightbulbs.obj");
     m_ceiling_lamp_lightbulb2 = Thing("objects/ceiling_lamp_lightbulbs2.obj");
 
     m_bed = Thing("objects/bed.obj");
@@ -386,7 +386,7 @@ void init(void)
     m_earth = Thing("objects/earth.obj");
     m_books = Thing("objects/books.obj");
     m_bookshelf = Thing("objects/bookshelf.obj");
-    m_ceiling_lamp1 = Thing("objects/ceiling_lamp1.obj");
+    m_ceiling_lamp1 = Thing("objects/ceiling_lamp.obj");
     m_ceiling_lamp2 = Thing("objects/ceiling_lamp2.obj");
     m_chair_back = Thing("objects/chair_back.obj");
     //m_chair_legs = Thing("objects/chair_legs.obj");
