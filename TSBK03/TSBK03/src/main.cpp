@@ -205,6 +205,7 @@ bool debugmode = false;
 bool isDoorRotating = false;
 bool isDoorClosed = true;
 int doorObjPos;
+int leafObjPos;
 glm::vec3 totalDoorTrans;
 int doorAngleMult = 0;
 const float doorAngle = float(-2.0 * PI / 3.0);
@@ -297,7 +298,7 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/bamboo6.tga", &t_bamboo6);								//
 	LoadTGATextureSimple("objects/textures/tga/bamboo_leaf.tga", &t_bamboo_leaf);						//
 	LoadTGATextureSimple("objects/textures/tga/flower_pot.tga", &t_flower_pot);
-	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_earth);
+	LoadTGATextureSimple("objects/textures/tga/earth.tga", &t_earth);
 	LoadTGATextureSimple("objects/textures/tga/books.tga", &t_books);
 	LoadTGATextureSimple("objects/textures/tga/bookshelf.tga", &t_bookshelf);
 	LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);						//
@@ -485,10 +486,10 @@ void init(void)
 	m_bamboo_leaf.MTWmatrix = glm::translate(bambooTrans) * m_bamboo_leaf.MTWmatrix;
 	m_flower_pot.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_flower_pot.MTWmatrix = glm::translate(sceneTrans) * m_flower_pot.MTWmatrix;
-	m_flower_pot.MTWmatrix = glm::translate(bambooTrans) * m_flower_pot.MTWmatrix;
+	//m_flower_pot.MTWmatrix = glm::translate(bambooTrans) * m_flower_pot.MTWmatrix;
 	m_earth.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_earth.MTWmatrix = glm::translate(sceneTrans) * m_earth.MTWmatrix;
-	m_earth.MTWmatrix = glm::translate(bambooTrans) * m_earth.MTWmatrix;
+	//m_earth.MTWmatrix = glm::translate(bambooTrans) * m_earth.MTWmatrix;
 	m_mattress.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
 	m_mattress.MTWmatrix = glm::translate(sceneTrans) * m_mattress.MTWmatrix;
 	m_sheet_pillow.MTWmatrix = glm::scale(glm::mat4(), sceneSize);
@@ -665,6 +666,7 @@ void init(void)
 	objlist.push_back(m_bamboo5);
 	objlist.push_back(m_bamboo6);
 	objlist.push_back(m_bamboo_leaf);
+	leafObjPos = objlist.size() - 1;
 	objlist.push_back(m_flower_pot);
 	objlist.push_back(m_earth);
 	objlist.push_back(m_mattress);
@@ -988,7 +990,16 @@ void draw_order(lightSource light, glm::mat4 textureMatrix)
 {
 	for (int n = 0; n < objlist.size(); n++)
 	{
-		objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+		if (n == leafObjPos)
+		{
+			glDisable(GL_CULL_FACE);
+			objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+			glEnable(GL_CULL_FACE);
+		}
+		else
+		{
+			objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+		}
 	}
 }
 
