@@ -77,7 +77,7 @@ Thing m_books, m_bookshelf;															// Bookshelf, etc.
 Thing m_ceiling_lamp1, m_ceiling_lamp2;												// Taklampor.
 Thing m_chair_back, m_chair_legs, m_chair_lower_part, m_chair_seat, m_chair_wheels;	// Chair. (LOTS OF POLYGONS)
 Thing m_desk, m_desk_cap, m_desk_cap_ring, m_desk_handle;							// Desk, etc.
-Thing m_desk_lamp, m_desk_lamp_bulb_holder, m_desk_lamp_shade;					// Desk lamp.
+Thing m_desk_lamp, m_desk_lamp_bulb_holder, m_desk_lamp_shade;						// Desk lamp.
 Thing m_door, m_door_frame, m_door_handle, m_door_keyhole;							// Door.
 Thing m_floor, m_ceiling, m_walls;													// Golv, väggar.
 Thing m_floor2, m_ceiling2, m_walls2;												// Rum 2.
@@ -277,7 +277,7 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling_bulb2);					// WHITE
 	
 	LoadTGATextureSimple("objects/textures/tga/bed.tga", &t_bed);
-	LoadTGATextureSimple("objects/textures/tga/bedside_table.tga", &t_bedside_table);					//
+	LoadTGATextureSimple("objects/textures/tga/bedside_table.tga", &t_bedside_table);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_handle.tga", &t_bedside_table_handle);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_doors.tga", &t_bedside_table_doors);
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp2.tga", &t_bedside_lamp);					//
@@ -308,16 +308,16 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/chair_seat.tga", &t_chair_seat);
 	//LoadTGATextureSimple("objects/textures/tga/chair_wheels.tga", &t_chair_wheels);
 	LoadTGATextureSimple("objects/textures/tga/desk.tga", &t_desk);
-	LoadTGATextureSimple("objects/textures/tga/desk_cap.tga", &t_desk_cap);								//
+	LoadTGATextureSimple("objects/textures/tga/desk_cap.tga", &t_desk_cap);
 	LoadTGATextureSimple("objects/textures/tga/desk_cap_ring.tga", &t_desk_cap_ring);
 	LoadTGATextureSimple("objects/textures/tga/desk_handle.tga", &t_desk_handle);
 	LoadTGATextureSimple("objects/textures/tga/desk_lamp.tga", &t_desk_lamp);
 	LoadTGATextureSimple("objects/textures/tga/desk_lamp_bulb_holder.tga", &t_desk_lamp_bulb_holder);
 	LoadTGATextureSimple("objects/textures/tga/desk_lamp_shade.tga", &t_desk_lamp_shade);
-	LoadTGATextureSimple("objects/textures/tga/Door.tga", &t_door);										//
-	LoadTGATextureSimple("objects/textures/tga/Door.tga", &t_door_frame);								//
-	LoadTGATextureSimple("objects/textures/tga/gray.tga", &t_door_handle);								//
-	LoadTGATextureSimple("objects/textures/tga/black.tga", &t_door_keyhole);
+	LoadTGATextureSimple("objects/textures/tga/door.tga", &t_door);
+	LoadTGATextureSimple("objects/textures/tga/door_frame.tga", &t_door_frame);
+	LoadTGATextureSimple("objects/textures/tga/door_handle.tga", &t_door_handle);								//
+	LoadTGATextureSimple("objects/textures/tga/door_keyhole.tga", &t_door_keyhole);
 	LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);									//
 	LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling);
 	LoadTGATextureSimple("objects/textures/tga/tapet1.tga", &t_walls);									//
