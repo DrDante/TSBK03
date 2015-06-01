@@ -280,7 +280,7 @@ void init(void)
 	LoadTGATextureSimple("objects/textures/tga/bedside_table.tga", &t_bedside_table);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_handle.tga", &t_bedside_table_handle);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_doors.tga", &t_bedside_table_doors);
-	LoadTGATextureSimple("objects/textures/tga/bedside_lamp2.tga", &t_bedside_lamp);					//
+	LoadTGATextureSimple("objects/textures/tga/bedside_lamp.tga", &t_bedside_lamp);					//
 	LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade);			//
 	LoadTGATextureSimple("objects/textures/tga/bedside_table2.tga", &t_bedside_table2);
 	LoadTGATextureSimple("objects/textures/tga/bedside_table_handle2.tga", &t_bedside_table_handle2);
