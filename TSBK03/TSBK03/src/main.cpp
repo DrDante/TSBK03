@@ -274,7 +274,7 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb1.tga", &t_bedside_lamp_lightbulb);
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb2.tga", &t_bedside_lamp_lightbulb2);
     LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);								// WHITE
-    LoadTGATextureSimple("objects/textures/tga/white.tga", &t_Hektar_light_bulb);								// WHITE
+    LoadTGATextureSimple("objects/textures/tga/Hektar_light_bulb.tga", &t_Hektar_light_bulb);								// WHITE
     LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb1.tga", &t_ceiling_lamp_lightbulb1);
     LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb2.tga", &t_ceiling_lamp_lightbulb2);		//
 
@@ -321,14 +321,14 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/door_handle.tga", &t_door_handle);
     LoadTGATextureSimple("objects/textures/tga/door_keyhole.tga", &t_door_keyhole);
     LoadTGATextureSimple("objects/textures/tga/floor.tga", &t_floor);									//
-    LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling);
-    LoadTGATextureSimple("objects/textures/tga/tapet1.tga", &t_walls);									//
-    LoadTGATextureSimple("objects/textures/tga/floor2.tga", &t_floor2);									//
-    LoadTGATextureSimple("objects/textures/tga/white.tga", &t_ceiling2);
-    LoadTGATextureSimple("objects/textures/tga/tapet2.tga", &t_walls2);									//
-    LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_shade);					//
-    LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_lamp_stand);					//
-    LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_Hektar_light_bulb_stand);				//
+    LoadTGATextureSimple("objects/textures/tga/ceiling.tga", &t_ceiling);
+    LoadTGATextureSimple("objects/textures/tga/walls.tga", &t_walls);									//
+    LoadTGATextureSimple("objects/textures/tga/floor2.tga", &t_floor2);
+    LoadTGATextureSimple("objects/textures/tga/ceiling2.tga", &t_ceiling2);
+    LoadTGATextureSimple("objects/textures/tga/walls2.tga", &t_walls2);
+    LoadTGATextureSimple("objects/textures/tga/Hektar_lamp_shade.tga", &t_Hektar_lamp_shade);
+    LoadTGATextureSimple("objects/textures/tga/Hektar_lamp_stand.tga", &t_Hektar_lamp_stand);
+    LoadTGATextureSimple("objects/textures/tga/Hektar_light_bulb_stand.tga", &t_Hektar_light_bulb_stand);
     LoadTGATextureSimple("objects/textures/tga/TV.tga", &t_TV);
     LoadTGATextureSimple("objects/textures/tga/TV_granite.tga", &t_TV_granite);
     LoadTGATextureSimple("objects/textures/tga/dark_gray.tga", &t_TV_screen);
