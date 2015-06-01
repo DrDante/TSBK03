@@ -91,7 +91,7 @@ std::vector<Thing> objlist;
 
 // Texturer
 GLuint t_bedside_lamp_lightbulb, t_bedside_lamp_lightbulb2;
-GLuint t_desk_lamp_lightbulb, t_Hektar_light_bulb, t_ceiling_lamp_lightbulb1, t_ceiling_lamp_lightbulb2;
+GLuint t_desk_lamp_lightbulb, t_Hektar_light_bulb, t_ceiling_lamp_lightbulb, t_ceiling_lamp_lightbulb2;
 GLuint t_bamboo1, t_bamboo2, t_bamboo3, t_bamboo4, t_bamboo5, t_bamboo6;
 GLuint t_bamboo_leaf, t_earth, t_flower_pot;
 GLuint t_bed, t_mattress, t_sheet_pillow;
@@ -271,18 +271,18 @@ void init(void)
 
 
     // Texturer
-    LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb1.tga", &t_bedside_lamp_lightbulb);
+    LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb.tga", &t_bedside_lamp_lightbulb);
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb2.tga", &t_bedside_lamp_lightbulb2);
     LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);								// WHITE
-    LoadTGATextureSimple("objects/textures/tga/Hektar_light_bulb.tga", &t_Hektar_light_bulb);								// WHITE
-    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb1.tga", &t_ceiling_lamp_lightbulb1);
-    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb2.tga", &t_ceiling_lamp_lightbulb2);		//
+    LoadTGATextureSimple("objects/textures/tga/Hektar_light_bulb.tga", &t_Hektar_light_bulb);
+    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb.tga", &t_ceiling_lamp_lightbulb);
+    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp_lightbulb2.tga", &t_ceiling_lamp_lightbulb2);
 
     LoadTGATextureSimple("objects/textures/tga/bed.tga", &t_bed);
     LoadTGATextureSimple("objects/textures/tga/bedside_table.tga", &t_bedside_table);
     LoadTGATextureSimple("objects/textures/tga/bedside_table_handle.tga", &t_bedside_table_handle);
     LoadTGATextureSimple("objects/textures/tga/bedside_table_doors.tga", &t_bedside_table_doors);
-    LoadTGATextureSimple("objects/textures/tga/bedside_lamp.tga", &t_bedside_lamp);						//
+    LoadTGATextureSimple("objects/textures/tga/bedside_lamp.tga", &t_bedside_lamp);
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_shade.tga", &t_bedside_lamp_shade);			//
     LoadTGATextureSimple("objects/textures/tga/bedside_table2.tga", &t_bedside_table2);
     LoadTGATextureSimple("objects/textures/tga/bedside_table_handle2.tga", &t_bedside_table_handle2);
@@ -302,7 +302,7 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/earth.tga", &t_earth);
     LoadTGATextureSimple("objects/textures/tga/books.tga", &t_books);
     LoadTGATextureSimple("objects/textures/tga/bookshelf.tga", &t_bookshelf);
-    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);					//
+    LoadTGATextureSimple("objects/textures/tga/ceiling_lamp1.tga", &t_ceiling_lamp1);
     LoadTGATextureSimple("objects/textures/tga/ceiling_lamp2.tga", &t_ceiling_lamp2);
     LoadTGATextureSimple("objects/textures/tga/chair_back.tga", &t_chair_back);
     //LoadTGATextureSimple("objects/textures/tga/chair_legs.tga", &t_chair_legs);
@@ -575,7 +575,7 @@ void init(void)
     texlist.push_back(t_bedside_lamp_lightbulb2);
     texlist.push_back(t_desk_lamp_lightbulb);
     texlist.push_back(t_Hektar_light_bulb);
-    texlist.push_back(t_ceiling_lamp_lightbulb1);
+    texlist.push_back(t_ceiling_lamp_lightbulb);
     texlist.push_back(t_ceiling_lamp_lightbulb2);
 
     texlist.push_back(t_bed);
