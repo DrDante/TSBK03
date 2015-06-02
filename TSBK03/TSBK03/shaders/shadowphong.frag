@@ -76,7 +76,7 @@ void main(void)
 	float depth = 0;
 
 	// filter_side x filter_side filtrering för snyggare skuggor
-	int filter_side = 3;
+	int filter_side = 5;
 	for(int y = -(filter_side - 1)/2; y <= (filter_side - 1)/2; y++)
 	{
 		for(int x = -(filter_side - 1)/2; x <= (filter_side - 1)/2; x++)

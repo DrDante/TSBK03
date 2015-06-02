@@ -182,16 +182,17 @@ bool draw4 = true;
 lightSource hektarlight(glm::vec3(35.9581 * scl, 4.17864 * scl, 17.8685 * scl), true, glm::vec3(22.7725 * scl, -6.70588 * scl, 1.33307 * scl));
 bool draw5 = true;
 lightSource ceillight11(glm::vec3(19.9485 * scl, 14.0732 * scl, 1.07951 * scl), true, glm::vec3(27.4963 * scl, 6.00726 * scl, 8.9098 * scl));
+bool drawc11 = true;
 lightSource ceillight12(glm::vec3(22.1733 * scl, 14.0158 * scl, 0.248075 * scl), true, glm::vec3(24.9946 * scl, 2.9704 * scl, -12.6847 * scl));
+bool drawc12 = true;
 lightSource ceillight13(glm::vec3(20.1561 * scl, 14.0178 * scl, -0.999484 * scl), true, glm::vec3(14.1301 * scl, 1.02795 * scl, 8.77931 * scl));
-bool draw6 = true;
-
+bool drawc13 = true;
 lightSource ceillight21(glm::vec3(1.40355 * scl, 14.4348 * scl, 1.05177 * scl), true, glm::vec3(7.80346 * scl, 12.7173 * scl, -0.180466 * scl));
-bool draw7 = true;
+bool drawc21 = true;
 lightSource ceillight22(glm::vec3(0.916115 * scl, 13.9485 * scl, -1.07603 * scl), true, glm::vec3(0.819954 * scl, 6.30125 * scl, -8.91277 * scl));
-bool draw8 = true;
+bool drawc22 = true;
 lightSource ceillight23(glm::vec3(-0.925582 * scl, 14.0328 * scl, 0.92627 * scl), true, glm::vec3(2.81801 * scl, 10.0247 * scl, 6.17313 * scl));
-bool draw9 = true;
+bool drawc23 = true;
 
 lightSource flashlight(glm::vec3(-16.405 * scl, 12.6004 * scl, -17.4967 * scl), true, glm::vec3(3.89842 * scl, -1.50879 * scl, 4.35974 * scl));
 bool drawf = false;
@@ -768,21 +769,27 @@ void display(void)
     {
         draw_scene(hektarlight);
     }
-    if (draw6)
-    {
-        draw_scene(ceillight11);
-        draw_scene(ceillight12);
+	if (drawc11)
+	{
+		draw_scene(ceillight11);
+	}
+	if (drawc12)
+	{
+		draw_scene(ceillight12);
+	}
+	if (drawc13)
+	{
         draw_scene(ceillight13);
     }
-    if (draw7)
+    if (drawc21)
     {
         draw_scene(ceillight21);
     }
-    if (draw8)
+    if (drawc22)
     {
         draw_scene(ceillight22);
     }
-    if (draw9)
+    if (drawc23)
     {
         draw_scene(ceillight23);
     }
@@ -818,21 +825,27 @@ void display(void)
         {
             draw_lights(hektarlight);
         }
-        if (draw6)
-        {
-            draw_lights(ceillight11);
-            draw_lights(ceillight12);
+		if (drawc11)
+		{
+			draw_lights(ceillight11);
+		}
+		if (drawc12)
+		{
+			draw_lights(ceillight12);
+		}
+		if (drawc13)
+		{
             draw_lights(ceillight13);
         }
-        if (draw7)
+        if (drawc21)
         {
             draw_lights(ceillight21);
         }
-        if (draw8)
+        if (drawc22)
         {
             draw_lights(ceillight22);
         }
-        if (draw9)
+        if (drawc23)
         {
             draw_lights(ceillight23);
         }
@@ -1098,18 +1111,24 @@ void handle_keypress(SDL_Event event)
         case SDLK_5:
             draw5 = !draw5;
             break;
-        case SDLK_6:
-            draw6 = !draw6;
+        case SDLK_KP_4:
+            drawc11 = !drawc11;
             break;
-        case SDLK_7:
-            draw7 = !draw7;
+        case SDLK_KP_5:
+            drawc12 = !drawc12;
             break;
-        case SDLK_8:
-            draw8 = !draw8;
+		case SDLK_KP_6:
+            drawc13 = !drawc13;
             break;
-        case SDLK_9:
-            draw9 = !draw9;
+		case SDLK_KP_7:
+            drawc21 = !drawc21;
             break;
+		case SDLK_KP_8:
+			drawc22 = !drawc22;
+			break;
+		case SDLK_KP_9:
+			drawc23 = !drawc23;
+			break;
         case SDLK_f:
             drawf = !drawf;
             break;
@@ -1154,7 +1173,7 @@ void handle_keypress(SDL_Event event)
             break;
             // Print spotlight positions for debugging.
         case SDLK_l:
-            std::cout << "sunlight position: " << sunlight.pos.x / scl << ", " << sunlight.pos.y / scl << ", " << sunlight.pos.z / scl << std::endl;
+            std::cout << "Sunlight position: " << sunlight.pos.x / scl << ", " << sunlight.pos.y / scl << ", " << sunlight.pos.z / scl << std::endl;
             break;
             // Öka bias.
         case SDLK_b:
