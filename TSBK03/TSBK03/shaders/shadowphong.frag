@@ -53,7 +53,7 @@ void main(void)
 
 	// Ljus enligt Phong-modellen:
 	kdiff = 0.6;
-	kspec = 1.0;
+	kspec = 0.3;
 	ambLight = kdiff * vec3(0.1, 0.1, 0.1);
 	diffLight = vec3(0.0, 0.0, 0.0);
 	specLight = vec3(0.0, 0.0, 0.0);
