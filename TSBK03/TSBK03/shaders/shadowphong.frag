@@ -96,6 +96,7 @@ void main(void)
 	int kappa = 10000; // Påverkar hur snabbt ljusintensitet avtar m.a.p. avstånd.
 	rangeComp = kappa/(kappa + distance*distance);
 
-	totalLight = vec3(texture(texUnit2, outTexCoord)) * totalLight * depth * rangeComp;
+	//totalLight = vec3(texture(texUnit2, outTexCoord)) * totalLight * depth * rangeComp;
+	totalLight = totalLight * depth * rangeComp;
 	out_color = vec4(totalLight, 1);
 }

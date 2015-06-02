@@ -263,8 +263,8 @@ void init(void)
 
     printError("init shader");
 
-
-    // Texturer
+	
+	/*// Texturer
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb.tga", &t_bedside_lamp_lightbulb);
     LoadTGATextureSimple("objects/textures/tga/bedside_lamp_lightbulb2.tga", &t_bedside_lamp_lightbulb2);
     LoadTGATextureSimple("objects/textures/tga/white.tga", &t_desk_lamp_lightbulb);								// WHITE
@@ -331,7 +331,7 @@ void init(void)
     LoadTGATextureSimple("objects/textures/tga/white.tga", &t_window_handle);									// WHITE
     LoadTGATextureSimple("objects/textures/tga/laptop.tga", &t_laptop);
     LoadTGATextureSimple("objects/textures/tga/screen.tga", &t_laptop_screen);
-    // --------
+    // --------*/
 
     // Laddning av modeller.
 
@@ -375,7 +375,7 @@ void init(void)
     m_bamboo4 = Thing("objects/bamboo4.obj");
     m_bamboo5 = Thing("objects/bamboo5.obj");
     m_bamboo6 = Thing("objects/bamboo6.obj");
-    m_bamboo_leaf = Thing("objects/bamboo_leaf.obj");
+    //m_bamboo_leaf = Thing("objects/bamboo_leaf.obj");
     m_flower_pot = Thing("objects/flower_pot.obj");
     m_earth = Thing("objects/earth.obj");
     m_books = Thing("objects/books.obj");
@@ -383,10 +383,10 @@ void init(void)
     m_ceiling_lamp1 = Thing("objects/ceiling_lamp.obj");
     m_ceiling_lamp2 = Thing("objects/ceiling_lamp2.obj");
     m_chair_back = Thing("objects/chair_back.obj");
-    m_chair_legs = Thing("objects/chair_legs.obj");
-    m_chair_lower_part = Thing("objects/chair_lower_part.obj");
+    //m_chair_legs = Thing("objects/chair_legs.obj");
+    //m_chair_lower_part = Thing("objects/chair_lower_part.obj");
     m_chair_seat = Thing("objects/chair_seat.obj");
-    m_chair_wheels = Thing("objects/chair_wheels.obj");
+    //m_chair_wheels = Thing("objects/chair_wheels.obj");
     m_desk = Thing("objects/desk.obj");
     m_desk_cap = Thing("objects/desk_cap.obj");
     m_desk_cap_ring = Thing("objects/desk_cap_ring.obj");
@@ -653,7 +653,7 @@ void init(void)
     objlist.push_back(m_bamboo4);
     objlist.push_back(m_bamboo5);
     objlist.push_back(m_bamboo6);
-    objlist.push_back(m_bamboo_leaf);
+    //objlist.push_back(m_bamboo_leaf);
     leafObjPos = objlist.size() - 1;
     objlist.push_back(m_flower_pot);
     objlist.push_back(m_earth);
@@ -664,10 +664,10 @@ void init(void)
     objlist.push_back(m_ceiling_lamp1);
     objlist.push_back(m_ceiling_lamp2);
     objlist.push_back(m_chair_back);
-    objlist.push_back(m_chair_legs);
-    objlist.push_back(m_chair_lower_part);
+    //objlist.push_back(m_chair_legs);
+    //objlist.push_back(m_chair_lower_part);
     objlist.push_back(m_chair_seat);
-    objlist.push_back(m_chair_wheels);
+    //objlist.push_back(m_chair_wheels);
     objlist.push_back(m_desk);
     objlist.push_back(m_desk_cap);
     objlist.push_back(m_desk_cap_ring);
@@ -970,12 +970,14 @@ void draw_order(lightSource light, glm::mat4 textureMatrix)
         if (n == leafObjPos)
         {
             glDisable(GL_CULL_FACE);
-            objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+            //objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+			objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &t_windows);
             glEnable(GL_CULL_FACE);
         }
         else
         {
-            objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+            //objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &texlist.at(n));
+			objlist.at(n).draw_with_depthinfo(shadowphongshader, textureMatrix, &t_windows);
         }
     }
 }
